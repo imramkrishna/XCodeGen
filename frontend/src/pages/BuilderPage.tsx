@@ -1,27 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { usePrompt } from '../context/PromptContext';
 import StepsList from '../components/builder/StepsList';
 import FileExplorer from '../components/builder/FileExplorer';
 import Header from '../components/common/Header';
 import Editor from '@monaco-editor/react';
 import { Code, Eye } from 'lucide-react';
+import axios from "axios"
+import { BACKEND_URL } from '../config';
+import { Step, StepType } from '../components/builder/StepsList';
 
 const BuilderPage = () => {
+  const location = useLocation();
+  const {inputValue}=location.state as {inputValue:string}
   const { prompt, isGenerating, setIsGenerating, currentStep, setCurrentStep } = usePrompt();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'code' | 'preview'>('code');
   const [selectedFile, setSelectedFile] = useState<{ name: string; content: string } | null>(null);
 
   // Mock steps for the generation process
-  const steps = [
-    { id: 1, title: 'Analyzing prompt', description: 'Understanding your website requirements...' },
-    { id: 2, title: 'Planning architecture', description: 'Designing the structure of your website...' },
-    { id: 3, title: 'Generating HTML structure', description: 'Creating the core layout and components...' },
-    { id: 4, title: 'Applying styles', description: 'Adding beautiful, responsive styling...' },
-    { id: 5, title: 'Adding interactivity', description: 'Implementing JavaScript functionality...' },
-    { id: 6, title: 'Finalizing', description: 'Polishing and preparing your website...' },
-  ];
+  const [steps]=useState<Step[]>([])
 
   // Mock file system structure
   const files = [
@@ -97,17 +95,31 @@ const BuilderPage = () => {
     if (fileName.endsWith('.ts') || fileName.endsWith('.tsx')) return 'typescript';
     return 'plaintext';
   };
-
+  async function init(){
+    const response=await axios.post(`${BACKEND_URL}/template`,{
+      message:inputValue.trim()
+    })
+    const {prompts,uiPrompts}=response.data
+    const stepsResponse=await axios.post(`${BACKEND_URL}/chat`,{
+      messages:[...prompts,inputValue].map(content=>({
+        role:"user",
+        content
+      }))
+    })
+  }
+ useEffect(()=>{
+  init();
+ },[])
   return (
-    <div className="min-h-screen flex flex-col bg-slate-900">
+    <div className="flex flex-col min-h-screen bg-slate-900">
       <Header />
       
-      <div className="flex-grow flex flex-col md:flex-row">
+      <div className="flex flex-col flex-grow md:flex-row">
         {/* Left panel - Steps */}
-        <div className="w-full md:w-1/3 lg:w-1/4 bg-slate-800 border-r border-slate-700 overflow-y-auto">
+        <div className="w-full overflow-y-auto border-r md:w-1/3 lg:w-1/4 bg-slate-800 border-slate-700">
           <div className="p-4 border-b border-slate-700">
             <h2 className="text-lg font-semibold text-slate-100">Building Your Website</h2>
-            <p className="text-sm text-slate-400 mt-1 line-clamp-2" title={prompt}>
+            <p className="mt-1 text-sm text-slate-400 line-clamp-2" title={prompt}>
               "{prompt}"
             </p>
           </div>
@@ -115,9 +127,9 @@ const BuilderPage = () => {
         </div>
         
         {/* Right panel - File Explorer and Editor/Preview */}
-        <div className="flex-grow overflow-hidden flex flex-col">
+        <div className="flex flex-col flex-grow overflow-hidden">
           {/* Tabs */}
-          <div className="flex items-center bg-slate-800 border-b border-slate-700 p-4">
+          <div className="flex items-center p-4 border-b bg-slate-800 border-slate-700">
             <div className="flex">
               <button
                 className={`flex items-center px-4 py-2 rounded-md mr-2 ${
@@ -145,10 +157,10 @@ const BuilderPage = () => {
           </div>
           
           {/* Content Area */}
-          <div className="flex-grow flex">
+          <div className="flex flex-grow">
             {/* File Explorer - Only visible in code tab */}
             {activeTab === 'code' && (
-              <div className="w-64 border-r border-slate-700 overflow-y-auto">
+              <div className="w-64 overflow-y-auto border-r border-slate-700">
                 <div className="p-3 border-b border-slate-700">
                   <h3 className="text-sm font-medium text-slate-300">Files</h3>
                 </div>
@@ -173,7 +185,7 @@ const BuilderPage = () => {
                     }}
                   />
                 ) : (
-                  <div className="h-full flex items-center justify-center text-slate-400 text-sm">
+                  <div className="flex items-center justify-center h-full text-sm text-slate-400">
                     Select a file to view its contents
                   </div>
                 )

@@ -10,36 +10,35 @@ const LandingPage = () => {
   const { setPrompt } = usePrompt();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit =(e: React.FormEvent) => {
     e.preventDefault();
     if (inputValue.trim()) {
-      setPrompt(inputValue.trim());
-      navigate('/builder');
+      navigate('/builder',{state:{inputValue}});
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-900">
+    <div className="flex flex-col min-h-screen bg-slate-900">
       <Header />
       
-      <main className="flex-grow flex flex-col items-center justify-center px-4 py-12">
-        <section className="max-w-5xl w-full text-center mb-12 animate-fade-in">
-          <h1 className="text-4xl md:text-6xl font-bold text-slate-100 mb-6">
+      <main className="flex flex-col items-center justify-center flex-grow px-4 py-12">
+        <section className="w-full max-w-5xl mb-12 text-center animate-fade-in">
+          <h1 className="mb-6 text-4xl font-bold md:text-6xl text-slate-100">
             Create Websites with{' '}
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
               Natural Language
             </span>
           </h1>
-          <p className="text-xl text-slate-400 max-w-3xl mx-auto">
+          <p className="max-w-3xl mx-auto text-xl text-slate-400">
             Describe your dream website and watch it come to life. No coding knowledge required.
           </p>
         </section>
 
-        <section className="w-full max-w-3xl bg-slate-800 rounded-2xl shadow-lg p-6 md:p-8 mb-12 transition-all hover:shadow-xl border border-slate-700">
+        <section className="w-full max-w-3xl p-6 mb-12 transition-all border shadow-lg bg-slate-800 rounded-2xl md:p-8 hover:shadow-xl border-slate-700">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="relative">
               <textarea
-                className="w-full h-40 p-4 pr-12 text-lg bg-slate-900 text-slate-200 border rounded-xl border-slate-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all placeholder:text-slate-500"
+                className="w-full h-40 p-4 pr-12 text-lg transition-all border outline-none bg-slate-900 text-slate-200 rounded-xl border-slate-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 placeholder:text-slate-500"
                 placeholder="Describe your website... (e.g., 'Create a personal portfolio site with a dark theme, project showcase, and contact form')"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
@@ -63,7 +62,7 @@ const LandingPage = () => {
           </form>
         </section>
 
-        <section className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-3 gap-6">
+        <section className="grid w-full max-w-4xl grid-cols-1 gap-6 md:grid-cols-3">
           {[
             {
               icon: <Layout className="w-8 h-8 text-blue-400" />,
@@ -83,10 +82,10 @@ const LandingPage = () => {
           ].map((feature, index) => (
             <div
               key={index}
-              className="bg-slate-800 rounded-xl p-6 shadow-md hover:shadow-lg transition-all border border-slate-700"
+              className="p-6 transition-all border shadow-md bg-slate-800 rounded-xl hover:shadow-lg border-slate-700"
             >
               <div className="mb-4">{feature.icon}</div>
-              <h3 className="text-xl font-semibold text-slate-200 mb-2">{feature.title}</h3>
+              <h3 className="mb-2 text-xl font-semibold text-slate-200">{feature.title}</h3>
               <p className="text-slate-400">{feature.description}</p>
             </div>
           ))}

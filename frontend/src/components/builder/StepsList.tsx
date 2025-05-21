@@ -1,10 +1,19 @@
 import React from 'react';
 import { CheckCircle, Clock, Loader2 } from 'lucide-react';
-
-type Step = {
+export enum StepType{
+  CreateFile,
+  CreateFolder,
+  EditFile,
+  DeleteFile,
+  RunScript
+}
+export type Step = {
   id: number;
   title: string;
+  type:StepType;
   description: string;
+  status:'pending' | 'in-progress' | 'completed';
+  code?:string
 };
 
 type StepsListProps = {
@@ -61,14 +70,14 @@ const StepsList = ({ steps, currentStep, isGenerating }: StepsListProps) => {
       </ul>
       
       {!isGenerating && currentStep === steps.length - 1 && (
-        <div className="mt-6 px-4">
-          <div className="p-4 bg-slate-700 border border-slate-600 rounded-lg">
-            <h4 className="text-green-400 font-medium text-sm">Website Generated!</h4>
-            <p className="text-slate-300 text-xs mt-1">
+        <div className="px-4 mt-6">
+          <div className="p-4 border rounded-lg bg-slate-700 border-slate-600">
+            <h4 className="text-sm font-medium text-green-400">Website Generated!</h4>
+            <p className="mt-1 text-xs text-slate-300">
               Your website has been successfully created. You can now explore the files and customize them further.
             </p>
             <div className="mt-3">
-              <button className="w-full py-2 px-3 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md transition-colors">
+              <button className="w-full px-3 py-2 text-sm font-medium text-white transition-colors bg-green-600 rounded-md hover:bg-green-700">
                 Preview Website
               </button>
             </div>
