@@ -12,8 +12,10 @@
   "description": "",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.50.4",
+    "@types/cors": "^2.8.18",
     "@types/dotenv": "^6.1.1",
     "@types/express": "^5.0.1",
+    "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0"
   }

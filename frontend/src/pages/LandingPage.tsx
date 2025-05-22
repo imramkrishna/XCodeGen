@@ -3,19 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Code, Layout, Terminal, Wand2 } from 'lucide-react';
 import Header from '../components/common/Header';
 import Footer from '../components/common/Footer';
-import { usePrompt } from '../context/PromptContext';
 
 const LandingPage = () => {
   const [inputValue, setInputValue] = useState('');
-  const { setPrompt } = usePrompt();
   const navigate = useNavigate();
 
-  const handleSubmit =(e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (inputValue.trim()) {
-      navigate('/builder',{state:{inputValue}});
+      navigate('/builder', { state: { inputValue } });
     }
   };
+
 
   return (
     <div className="flex flex-col min-h-screen bg-slate-900">

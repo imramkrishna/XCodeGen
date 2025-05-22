@@ -5,12 +5,14 @@ import { TextBlock } from "@anthropic-ai/sdk/resources/messages";
 import { basePrompt as nodeBasePrompt } from "./defaults/node";
 import { basePrompt as reactBasePrompt } from "./defaults/react";
 import { BASE_PROMPT, getSystemPrompt } from "./prompts";
+import cors from "cors"
 dotenv.config()
 const anthropic = new Anthropic({
     apiKey: process.env.CLAUDE_API_KEY
 })
 const app = express();
 app.use(express.json())
+app.use(cors())
 app.listen(3000, () => {
     console.log("Server is running on port 3000")
 })
