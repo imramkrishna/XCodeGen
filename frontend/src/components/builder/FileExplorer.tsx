@@ -1,85 +1,85 @@
 import React, { useState } from 'react';
-import { ChevronRight, ChevronDown, Folder, FileText, Code } from 'lucide-react';
+import { FolderTree, File, ChevronRight, ChevronDown } from 'lucide-react';
+import { FileItem } from '../../types';
 
-type FileNode = {
-  name: string;
-  type: 'file' | 'folder';
-  content?: string;
-  children?: FileNode[];
-};
+interface FileExplorerProps {
+  files: FileItem[];
+  onFileSelect: (file: FileItem) => void;
+}
 
-type FileExplorerProps = {
-  files: FileNode[];
-  onSelectFile: (file: FileNode) => void;
-};
+interface FileNodeProps {
+  item: FileItem;
+  depth: number;
+  onFileClick: (file: FileItem) => void;
+}
 
-const FileTreeNode = ({ node, depth = 0, onSelectFile }: { 
-  node: FileNode; 
-  depth?: number; 
-  onSelectFile: (file: FileNode) => void; 
-}) => {
-  const [isOpen, setIsOpen] = useState(depth < 1);
-  const isFolder = node.type === 'folder';
-  
-  const handleToggle = () => {
-    if (isFolder) {
-      setIsOpen(!isOpen);
+function FileNode({ item, depth, onFileClick }: FileNodeProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const handleClick = () => {
+    if (item.type === 'folder') {
+      setIsExpanded(!isExpanded);
     } else {
-      onSelectFile(node);
+      onFileClick(item);
     }
   };
 
   return (
-    <li>
-      <div 
-        className={`flex items-center py-1.5 px-2 rounded-md cursor-pointer hover:bg-slate-700 ${depth > 0 ? 'ml-5' : ''}`}
-        onClick={handleToggle}
+    <div className="select-none">
+      <div
+        className="flex items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-gray-800"
+        style={{ paddingLeft: `${depth * 1.5}rem` }}
+        onClick={handleClick}
       >
-        {isFolder ? (
-          isOpen ? <ChevronDown className="w-4 h-4 text-slate-400 mr-1.5" /> : <ChevronRight className="w-4 h-4 text-slate-400 mr-1.5" />
-        ) : (
-          <span className="w-4 ml-1.5 mr-1.5" />
+        {item.type === 'folder' && (
+          <span className="text-gray-400">
+            {isExpanded ? (
+              <ChevronDown className="w-4 h-4" />
+            ) : (
+              <ChevronRight className="w-4 h-4" />
+            )}
+          </span>
         )}
-        
-        {isFolder ? (
-          <Folder className="w-4 h-4 text-blue-400 mr-2" />
+        {item.type === 'folder' ? (
+          <FolderTree className="w-4 h-4 text-blue-400" />
         ) : (
-          <FileText className="w-4 h-4 text-slate-400 mr-2" />
+          <File className="w-4 h-4 text-gray-400" />
         )}
-        
-        <span className="text-sm text-slate-300">{node.name}</span>
+        <span className="text-gray-200">{item.name}</span>
       </div>
-      
-      {isFolder && isOpen && node.children && (
-        <ul className="mt-1">
-          {node.children.map((child, index) => (
-            <FileTreeNode 
-              key={`${child.name}-${index}`} 
-              node={child} 
-              depth={depth + 1} 
-              onSelectFile={onSelectFile}
+      {item.type === 'folder' && isExpanded && item.children && (
+        <div>
+          {item.children.map((child, index) => (
+            <FileNode
+              key={`${child.path}-${index}`}
+              item={child}
+              depth={depth + 1}
+              onFileClick={onFileClick}
             />
           ))}
-        </ul>
+        </div>
       )}
-    </li>
-  );
-};
-
-const FileExplorer = ({ files, onSelectFile }: FileExplorerProps) => {
-  return (
-    <div className="p-2">
-      <ul>
-        {files.map((file, index) => (
-          <FileTreeNode 
-            key={`${file.name}-${index}`} 
-            node={file} 
-            onSelectFile={onSelectFile} 
-          />
-        ))}
-      </ul>
     </div>
   );
-};
+}
 
-export default FileExplorer;
+export function FileExplorer({ files, onFileSelect }: FileExplorerProps) {
+  return (
+    <div className="h-full p-4 overflow-auto bg-gray-900 rounded-lg shadow-lg">
+      <h2 className="flex items-center gap-2 mb-4 text-lg font-semibold text-gray-100">
+        <FolderTree className="w-5 h-5" />
+        File Explorer
+      </h2>
+      <div className="space-y-1">
+        {files.map((file, index) => (
+          <FileNode
+            key={`${file.path}-${index}`}
+            item={file}
+            depth={0}
+            onFileClick={onFileSelect}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}

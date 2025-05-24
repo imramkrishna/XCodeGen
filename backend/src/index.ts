@@ -5,11 +5,15 @@ import { TextBlock } from "@anthropic-ai/sdk/resources/messages";
 import { basePrompt as nodeBasePrompt } from "./defaults/node";
 import { basePrompt as reactBasePrompt } from "./defaults/react";
 import { BASE_PROMPT, getSystemPrompt } from "./prompts";
+import OpenAI from "openai";
 import cors from "cors"
 dotenv.config()
 const anthropic = new Anthropic({
     apiKey: process.env.CLAUDE_API_KEY
 })
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+});
 const app = express();
 app.use(express.json())
 app.use(cors())
@@ -51,11 +55,18 @@ app.post("/chat", async (req, res) => {
     const messages = req.body.messages;
     const response = await anthropic.messages.create({
         model: "claude-3-7-sonnet-20250219",
-        max_tokens: 9000,
+        max_tokens: 100,
         system: getSystemPrompt(),
         messages: messages
     })
+    // const response = openai.chat.completions.create({
+    //     model: "gpt-4o-mini",
+    //     store: true,
+    //     messages: messages,
+    // });
     console.log(response);
-    res.json({})
+    res.json({
+        response:response
+    })
 })
 
