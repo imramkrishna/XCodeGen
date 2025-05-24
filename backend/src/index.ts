@@ -52,21 +52,28 @@ app.post("/template", async (req, res) => {
     return;
 })
 app.post("/chat", async (req, res) => {
-    const messages = req.body.messages;
-    const response = await anthropic.messages.create({
-        model: "claude-3-7-sonnet-20250219",
-        max_tokens: 100,
-        system: getSystemPrompt(),
-        messages: messages
-    })
-    // const response = openai.chat.completions.create({
-    //     model: "gpt-4o-mini",
-    //     store: true,
-    //     messages: messages,
-    // });
-    console.log(response);
-    res.json({
-        response:response
-    })
+    try {
+        const messages = req.body.messages;
+        const response = await anthropic.messages.create({
+            model: "claude-3-7-sonnet-20250219",
+            max_tokens: 8000,
+            system: getSystemPrompt(),
+            messages: messages
+        })
+        // const response = openai.chat.completions.create({
+        //     model: "gpt-4o-mini",
+        //     store: true,
+        //     messages: messages,
+        // });
+        console.log(response);
+        res.json({
+            response: response
+        })
+    } catch (e) {
+        console.log("Error while sending response",e)
+        res.json({
+            message:"Error while sending your request"
+        })
+    }
 })
 
