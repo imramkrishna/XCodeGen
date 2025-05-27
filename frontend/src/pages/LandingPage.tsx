@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Code, Layout, Terminal, Wand2 } from 'lucide-react';
 import Header from '../components/common/Header';
 import Footer from '../components/common/Footer';
+import parsedFiles from "../xmlParser"
 
 const LandingPage = () => {
   const [inputValue, setInputValue] = useState('');
@@ -14,6 +15,7 @@ const LandingPage = () => {
       navigate('/builder', { state: { inputValue } });
     }
   };
+  console.log("Parsed FIle Structure: ",parsedFiles)
 
 
   return (

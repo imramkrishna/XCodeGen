@@ -45,7 +45,7 @@ app.post("/template", async (req, res) => {
         console.log("This is answer:",answer?.trim())
     if (answer?.trim() == "react") {
         res.json({
-            prompts: [BASE_PROMPT, `Here is an artifact that contains all files of the project visible to you.\nConsider the contents of ALL files in the project.\n\n${reactBasePrompt}\n\nHere is a list of files that exist on the file system but are not being shown to you:\n\n  - .gitignore\n  - package-lock.json\n`],
+            prompts: [BASE_PROMPT, `Here is an artifact that contains all files of the project visible to you.\nConsider the contents of ALL files in the project.\n\n ${MessageFormat}\n\n${reactBasePrompt}\n\nHere is a list of files that exist on the file system but are not being shown to you:\n\n  - .gitignore\n  - package-lock.json\n`],
             uiPrompts: [reactBasePrompt]
         })
         return;
@@ -53,13 +53,13 @@ app.post("/template", async (req, res) => {
 
     if (answer?.trim() == "node") {
         res.json({
-            prompts: [`Here is an artifact that contains all files of the project visible to you.\nConsider the contents of ALL files in the project.\n\n${nodeBasePrompt}\n\nHere is a list of files that exist on the file system but are not being shown to you:\n\n  - .gitignore\n  - package-lock.json\n`],
+            prompts: [`Here is an artifact that contains all files of the project visible to you.\nConsider the contents of ALL files in the project.\n\n ${MessageFormat}\n\n${nodeBasePrompt}\n\nHere is a list of files that exist on the file system but are not being shown to you:\n\n  - .gitignore\n  - package-lock.json\n`],
             uiPrompts: [nodeBasePrompt]
         })
         return;
     }
     res.status(403).json({
-        message: "SOrry this cant be built using current version of this app."
+        message: "Sorry this cant be built using current version of this app."
     })
     return;
 })

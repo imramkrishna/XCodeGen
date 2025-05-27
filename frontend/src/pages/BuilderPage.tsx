@@ -163,7 +163,11 @@ useEffect(() => {
         content
       }))
     })
-    console.log(stepsResponse)
+    setSteps(s => [...s, ...parseXml(stepsResponse.data.response).map(x => ({
+      ...x,
+      status: "pending" as "pending"
+    }))]);
+
   }
   useEffect(() => {
      if (!inputValue) {
