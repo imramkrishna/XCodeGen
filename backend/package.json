@@ -12,9 +12,12 @@
   "description": "",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.50.4",
+    "@google/genai": "^1.0.1",
+    "@types/axios": "^0.9.36",
     "@types/cors": "^2.8.18",
     "@types/dotenv": "^6.1.1",
     "@types/express": "^5.0.1",
+    "axios": "^1.9.0",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
