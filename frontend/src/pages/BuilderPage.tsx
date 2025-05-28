@@ -303,7 +303,7 @@ const BuilderPage = () => {
                     : 'bg-blue-600 text-white hover:bg-blue-700'
                 }`}
                 onClick={handleDownloadProject}
-                disabled={!isProjectComplete || isDownloading}
+                disabled={!showCommand || isDownloading}
                 title={!isProjectComplete ? "Complete all steps to download" : "Download project files"}
               >
                 {isDownloading ? (
