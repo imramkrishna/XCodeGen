@@ -1,4 +1,4 @@
-const MessageFormat = `
+export const MessageFormat = `
 Generate responses in this exact format:
 
 [Optional: Brief intro paragraph]
