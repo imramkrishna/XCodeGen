@@ -6,7 +6,7 @@ import Header from '../components/common/Header';
 import Editor from '@monaco-editor/react';
 import { Code, Eye } from 'lucide-react';
 import axios from "axios"
-import { BACKEND_URL } from '../config';
+
 import { Step, StepType } from '../components/builder/StepsList';
 import { parseXml } from '../steps';
 import { FileItem } from '../types';
@@ -15,6 +15,8 @@ import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 
 const BuilderPage = () => {
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+  console.log("backendurl: ",BACKEND_URL)
   const location = useLocation();
   const [currentStep, setCurrentStep] = useState(1);
   const { inputValue } = location.state as { inputValue: string }
