@@ -14,7 +14,6 @@ import { useRef } from 'react';
 import parseFileStructure from '../xmlParser';
 
 const BuilderPage = () => {
-  const finalAnswerRef=useRef();
   const location = useLocation();
   const [currentStep, setCurrentStep] = useState(1);
   const { inputValue } = location.state as { inputValue: string }
@@ -24,6 +23,7 @@ const BuilderPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'code' | 'preview'>('code');
   const [selectedFile, setSelectedFile] = useState<FileItem | null>(null);
+  const [showCommand, setShowCommand] = useState(false);
 
   // Mock steps for the generation process
   const [steps, setSteps] = useState<Step[]>([])
@@ -31,54 +31,24 @@ const BuilderPage = () => {
 
   // Mock file system structure
   const [files, setFiles] = useState<FileItem[]>([])
-  // {
-  //   name: 'index.html',
-  //   type: 'file',
-  //   content: '<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>Your Website</title>\n  <link rel="stylesheet" href="styles.css">\n</head>\n<body>\n  <div id="app"></div>\n  <script src="main.js"></script>\n</body>\n</html>',
-  // },
-  // {
-  //   name: 'styles.css',
-  //   type: 'file',
-  //   content: '* {\n  box-sizing: border-box;\n  margin: 0;\n  padding: 0;\n}\n\nbody {\n  font-family: "Inter", sans-serif;\n  line-height: 1.5;\n  color: #333;\n}\n\n.container {\n  max-width: 1200px;\n  margin: 0 auto;\n  padding: 0 16px;\n}',
-  // },
-  // {
-  //   name: 'main.js',
-  //   type: 'file',
-  //   content: 'document.addEventListener("DOMContentLoaded", () => {\n  console.log("Website initialized!");\n});\n',
-  // },
-  // {
-  //   name: 'assets',
-  //   type: 'folder',
-  //   children: [
-  //     { name: 'logo.svg', type: 'file', content: '<svg>...</svg>' },
-  //     { name: 'hero.jpg', type: 'file', content: 'Binary image data' },
-  //   ],
-  // },
-  // {
-  //   name: 'components',
-  //   type: 'folder',
-  //   children: [
-  //     { name: 'header.js', type: 'file', content: '// Header component code' },
-  //     { name: 'footer.js', type: 'file', content: '// Footer component code' },
-  //   ],
-  // },
 
-useEffect(() => {
+
+  useEffect(() => {
     let originalFiles = [...files];
     let updateHappened = false;
-    steps.filter(({status}) => status === "pending").map(step => {
+    steps.filter(({ status }) => status === "pending").map(step => {
       updateHappened = true;
       if (step?.type === StepType.CreateFile) {
         let parsedPath = step.path?.split("/") ?? []; // ["src", "components", "App.tsx"]
         let currentFileStructure = [...originalFiles]; // {}
         let finalAnswerRef = currentFileStructure;
-  
+
         let currentFolder = ""
-        while(parsedPath.length) {
-          currentFolder =  `${currentFolder}/${parsedPath[0]}`;
+        while (parsedPath.length) {
+          currentFolder = `${currentFolder}/${parsedPath[0]}`;
           let currentFolderName = parsedPath[0];
           parsedPath = parsedPath.slice(1);
-  
+
           if (!parsedPath.length) {
             // final file
             let file = currentFileStructure.find(x => x.path === currentFolder)
@@ -104,7 +74,7 @@ useEffect(() => {
                 children: []
               })
             }
-  
+
             currentFileStructure = currentFileStructure.find(x => x.path === currentFolder)!.children!;
           }
         }
@@ -121,7 +91,7 @@ useEffect(() => {
           ...s,
           status: "completed"
         }
-        
+
       }))
     }
     console.log(files);
@@ -161,15 +131,16 @@ useEffect(() => {
         content
       }))
     })
-    console.log("Steps response: ",stepsResponse.data.response)
+    console.log("Steps response: ", stepsResponse.data.response)
     setSteps(s => [...s, ...parseFileStructure(stepsResponse.data.response).map(x => ({
       ...x,
       status: "pending" as "pending"
     }))]);
+    setShowCommand(true)
 
   }
   useEffect(() => {
-     if (!inputValue) {
+    if (!inputValue) {
       navigate('/');
       return;
     }
@@ -179,19 +150,55 @@ useEffect(() => {
     <div className="flex flex-col min-h-screen bg-slate-900">
       <Header />
 
-      <div className="flex flex-col flex-grow md:flex-row">
+      <div className="flex flex-col flex-grow w-full h-full overflow-hidden md:flex-row">
         {/* Left panel - Steps */}
-        <div className="w-full overflow-y-auto border-r md:w-1/3 lg:w-1/4 bg-slate-800 border-slate-700">
-          <div className="p-1 border-b border-slate-700">
+        <div className="flex flex-col w-full h-screen max-h-screen border-r md:w-1/3 lg:w-1/4 bg-slate-800 border-slate-700">
+          {/* Header */}
+          <div className="flex-shrink-0 p-4 border-b border-slate-700">
             <h2 className="text-lg font-semibold text-slate-100">Building Your Website</h2>
-            <p className="mt-1 text-sm text-slate-400 line-clamp-2" title={inputValue}>
-              "{inputValue}"
+          </div>
+
+          {/* Message section */}
+          <div className="flex-shrink-0 p-4 border-b border-slate-700">
+            <h3 className="mb-2 text-sm font-medium text-slate-300">Your Request</h3>
+            <p className="text-sm text-slate-400 line-clamp-3" title={inputValue}>
+              {inputValue}
+            </p>
+          </div>
+
+          {/* Steps list with proper overflow */}
+          <div className="flex-1 min-h-0 overflow-y-auto">
+            <div className="p-4">
+              <h3 className="mb-2 text-sm font-medium text-slate-300">Build Steps</h3>
               <StepsList
                 steps={steps}
                 currentStep={currentStep}
                 onStepClick={setCurrentStep}
               />
-            </p>
+              {showCommand && (
+                <div className="mt-6 mb-2 overflow-hidden rounded-md">
+                  <div className="bg-gray-900 px-3 py-1.5 flex items-center border-b border-gray-700">
+                    <div className="flex space-x-1.5 mr-2">
+                      <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                      <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                    </div>
+                    <p className="text-xs text-gray-400">Terminal</p>
+                  </div>
+                  <div className="p-4 font-mono text-sm bg-gray-800">
+                    <p className="mb-3 text-gray-300">Run these commands to run this project on your system:</p>
+                    <div className="flex items-start mb-2">
+                      <span className="mr-2 text-green-400">$</span>
+                      <span className="text-blue-300">npm install</span>
+                    </div>
+                    <div className="flex items-start">
+                      <span className="mr-2 text-green-400">$</span>
+                      <span className="text-blue-300">npm run dev</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
