@@ -6,7 +6,8 @@ interface ParsedFile {
   path: string;
   content: string;
   message: string;
-  initialMessage?:string; // Added message field to store descriptive text
+  initialMessage?:string; 
+  status:'pending' | 'in-progress' | 'completed';// Added message field to store descriptive text
 }
 
 
@@ -111,7 +112,8 @@ function parseFileStructure(text: string): ParsedFile[] {
         fileName,
         path: fullPath,
         content: content.trim(),
-        message: message.trim() // Include the message
+        message: message.trim(),
+        status:"pending"
       });
     }
     if(files[0]){
@@ -122,86 +124,74 @@ function parseFileStructure(text: string): ParsedFile[] {
 }
 
 // Example usage with your actual document:
-const yourDocumentText: string = `Okay, I will create a frontend structure for a consultancy website with a separate header and footer component. I'll focus on a clean and modern design, making use of Tailwind CSS for styling, and Lucide React for icons. I will also add some placeholder content and Unsplash images to make it visually appealing.
+// const yourDocumentText: string = `Okay, I will create a frontend structure for a consultancy website with a separate header and footer component. I'll focus on a clean and modern design, making use of Tailwind CSS for styling, and Lucide React for icons. I will also add some placeholder content and Unsplash images to make it visually appealing.
 
-Here's the updated file structure and content:
+// Here's the updated file structure and content:
 
-**1. \`src/App.tsx\`**
+// **1. \`src/App.tsx\`**
 
-\`\`\`tsx
-import React from 'react';
-import Header from './components/Header';
-import Footer from './components/Footer';
-import MainContent from './components/MainContent'; // Import the MainContent component
+// \`\`\`tsx
+// import React from 'react';
+// import Header from './components/Header';
+// import Footer from './components/Footer';
+// import MainContent from './components/MainContent'; // Import the MainContent component
 
-function App() {
-  return (
-    <div className="min-h-screen text-gray-800 bg-white">
-      <Header />
-      <MainContent /> {/* Render the MainContent component */}
-      <Footer />
-    </div>
-  );
-}
+// function App() {
+//   return (
+//     <div className="min-h-screen text-gray-800 bg-white">
+//       <Header />
+//       <MainContent /> {/* Render the MainContent component */}
+//       <Footer />
+//     </div>
+//   );
+// }
 
-export default App;
-\`\`\`
+// export default App;
+// \`\`\`
 
-**2. \`src/components/Header.tsx\`**
+// **2. \`src/components/Header.tsx\`**
 
-\`\`\`tsx
-import React from 'react';
-import { Brain } from 'lucide-react'; // Using Brain icon for consultancy
-import logo from './assets/logo.png';
+// \`\`\`tsx
+// import React from 'react';
+// import { Brain } from 'lucide-react'; // Using Brain icon for consultancy
+// import logo from './assets/logo.png';
 
-function Header() {
-  return (
-    <header className="py-4 bg-white shadow-md">
-      <div className="container flex items-center justify-between px-6 mx-auto">
-        <a href="/" className="flex items-center text-2xl font-semibold">
-          <img src={logo} alt="Consultancy Logo" className="w-8 h-8 mr-2" />
-          Acme Consultancy
-        </a>
-        <nav>
-          <ul className="flex space-x-6">
-            <li><a href="/" className="hover:text-blue-500">Home</a></li>
-            <li><a href="/services" className="hover:text-blue-500">Services</a></li>
-            <li><a href="/about" className="hover:text-blue-500">About</a></li>
-            <li><a href="/contact" className="hover:text-blue-500">Contact</a></li>
-          </ul>
-        </nav>
-        <button className="px-4 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700 focus:outline-none focus:shadow-outline">
-          Get a Quote
-        </button>
-      </div>
-    </header>
-  );
-}
+// function Header() {
+//   return (
+//     <header className="py-4 bg-white shadow-md">
+//       <div className="container flex items-center justify-between px-6 mx-auto">
+//         <a href="/" className="flex items-center text-2xl font-semibold">
+//           <img src={logo} alt="Consultancy Logo" className="w-8 h-8 mr-2" />
+//           Acme Consultancy
+//         </a>
+//         <nav>
+//           <ul className="flex space-x-6">
+//             <li><a href="/" className="hover:text-blue-500">Home</a></li>
+//             <li><a href="/services" className="hover:text-blue-500">Services</a></li>
+//             <li><a href="/about" className="hover:text-blue-500">About</a></li>
+//             <li><a href="/contact" className="hover:text-blue-500">Contact</a></li>
+//           </ul>
+//         </nav>
+//         <button className="px-4 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700 focus:outline-none focus:shadow-outline">
+//           Get a Quote
+//         </button>
+//       </div>
+//     </header>
+//   );
+// }
 
-export default Header;
-\`\`\`
+// export default Header;
+// \`\`\`
 
-**6. \`src/index.css\`**
+// **6. \`src/index.css\`**
 
-\`\`\`css
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-\`\`\``;
+// \`\`\`css
+// @tailwind base;
+// @tailwind components;
+// @tailwind utilities;
+// \`\`\``;
 
 // Parse the files
-const parsedFiles: ParsedFile[] = parseFileStructure(yourDocumentText);
-
-console.log('Parsed Files:');
-parsedFiles.forEach((file: ParsedFile, index: number) => {
-  console.log(`\n--- File ${index + 1} ---`);
-  console.log('File Name:', file.fileName);
-  console.log('Path:', file.path);
-  console.log('Content Length:', file.content.length, 'characters');
-  console.log('Content Preview:');
-  console.log(file.content.substring(0, 100) + '...');
-  console.log('Message:', file.message); // Display the message
-});
 
 // Export for use in other modules
-export default parsedFiles;
+export default parseFileStructure;

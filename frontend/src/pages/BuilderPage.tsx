@@ -11,6 +11,7 @@ import { Step, StepType } from '../components/builder/StepsList';
 import { parseXml } from '../steps';
 import { FileItem } from '../types';
 import { useRef } from 'react';
+import parseFileStructure from '../xmlParser';
 
 const BuilderPage = () => {
   const finalAnswerRef=useRef();
@@ -128,14 +129,14 @@ useEffect(() => {
 
 
 
-  const handleFileSelect = (file: any) => {
-    if (file.type === 'file') {
-      setSelectedFile({
-        name: files.name,
-        content: files.content
-      });
-    }
-  };
+  // const handleFileSelect = (file: any) => {
+  //   if (file.type === 'file') {
+  //     setSelectedFile({
+  //       name: files.name,
+  //       content: files.content
+  //     });
+  //   }
+  // };
 
   const getFileLanguage = (fileName: string) => {
     if (fileName.endsWith('.html')) return 'html';
@@ -149,10 +150,7 @@ useEffect(() => {
     const response = await axios.post(`${BACKEND_URL}/template`, {
       prompt: inputValue.trim()
     })
-    console.log("response received",response.data)
-    console.log("Sending request for steps response: ")
     const { prompts, uiPrompts } = response.data
-    console.log(uiPrompts[0])
     setSteps(parseXml(uiPrompts[0]).map((x: Step) => ({
       ...x,
       status: "pending"
@@ -163,6 +161,7 @@ useEffect(() => {
         content
       }))
     })
+    console.log("Steps response: ",stepsResponse.data.response)
     setSteps(s => [...s, ...parseXml(stepsResponse.data.response).map(x => ({
       ...x,
       status: "pending" as "pending"
