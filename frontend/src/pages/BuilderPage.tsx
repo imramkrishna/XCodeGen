@@ -162,7 +162,7 @@ useEffect(() => {
       }))
     })
     console.log("Steps response: ",stepsResponse.data.response)
-    setSteps(s => [...s, ...parseXml(stepsResponse.data.response).map(x => ({
+    setSteps(s => [...s, ...parseFileStructure(stepsResponse.data.response).map(x => ({
       ...x,
       status: "pending" as "pending"
     }))]);

@@ -1,35 +1,55 @@
 /**
- * Interface representing a parsed file object
+ * Enums and types for step processing
  */
-interface ParsedFile {
-  fileName: string;
-  path: string;
-  content: string;
-  message: string;
-  initialMessage?:string; 
-  status:'pending' | 'in-progress' | 'completed';// Added message field to store descriptive text
+export enum StepType {
+  CreateFile,
+  CreateFolder,
+  EditFile,
+  DeleteFile,
+  RunScript
 }
 
+export type Step = {
+  id: number;
+  title: string;
+  type: StepType;
+  description: string;
+  status: 'pending' | 'in-progress' | 'completed';
+  code?: string
+  path?: string
+};
 
 /**
- * Parses a formatted text string and extracts file information
+ * Parses a formatted text string and extracts file information as Steps
  * @param text - The formatted text containing file structures
- * @returns Array of objects with fileName, path, content, and messages
+ * @returns Array of Step objects
  */
-var generalMessage="";
-function parseFileStructure(text: string): ParsedFile[] {
-  const files: ParsedFile[] = [];
+function parseFileStructure(text: string): Step[] {
+  const steps: Step[] = [];
+  let stepId = 1;
+  
   // Extract general message at the beginning
+  let generalMessage = "";
   const firstFileMarker = text.match(/\*\*\d+\.\s*`[^`]+`\*\*/);
   if (firstFileMarker && firstFileMarker.index) {
     generalMessage = text.substring(0, firstFileMarker.index).trim();
   }
   
+  // Add a general project folder step if there's a general message
+  if (generalMessage) {
+    steps.push({
+      id: stepId++,
+      title: "Project Files",
+      type: StepType.CreateFolder,
+      description: generalMessage,
+      status: "pending"
+    });
+  }
   
   // Split by file markers (lines that start with **number. `path`**)
   const sections: string[] = text.split(/(?=\*\*\d+\.\s*`[^`]+`\*\*)/);
   
-  sections.forEach((section: string, index: number) => {
+  sections.forEach((section: string) => {
     if (!section.trim()) return;
     
     const lines: string[] = section.split('\n');
@@ -47,6 +67,7 @@ function parseFileStructure(text: string): ParsedFile[] {
     const fullPath: string = pathMatch[1];
     const pathParts: string[] = fullPath.split('/');
     const fileName: string = pathParts[pathParts.length - 1];
+    
     // Extract content from code blocks
     let content: string = '';
     let inCodeBlock: boolean = false;
@@ -54,9 +75,6 @@ function parseFileStructure(text: string): ParsedFile[] {
     
     // Find all non-code text (before and after code blocks)
     let message = "";
-    if (index === 0) {
-      message = generalMessage;
-    }
     
     let nonCodeLines: string[] = [];
     let collectingNonCode = true;
@@ -108,90 +126,20 @@ function parseFileStructure(text: string): ParsedFile[] {
     }
     
     if (content) {
-      files.push({
-        fileName,
-        path: fullPath,
-        content: content.trim(),
-        message: message.trim(),
-        status:"pending"
+      // Create file step
+      steps.push({
+        id: stepId++,
+        title: `Create ${fileName}`,
+        type: StepType.CreateFile,
+        description: message.trim(),
+        status: "pending",
+        code: content.trim(),
+        path: fullPath
       });
     }
-    if(files[0]){
-      files[0].initialMessage=generalMessage
-    }
   });
-  return files;
+  
+  return steps;
 }
 
-// Example usage with your actual document:
-// const yourDocumentText: string = `Okay, I will create a frontend structure for a consultancy website with a separate header and footer component. I'll focus on a clean and modern design, making use of Tailwind CSS for styling, and Lucide React for icons. I will also add some placeholder content and Unsplash images to make it visually appealing.
-
-// Here's the updated file structure and content:
-
-// **1. \`src/App.tsx\`**
-
-// \`\`\`tsx
-// import React from 'react';
-// import Header from './components/Header';
-// import Footer from './components/Footer';
-// import MainContent from './components/MainContent'; // Import the MainContent component
-
-// function App() {
-//   return (
-//     <div className="min-h-screen text-gray-800 bg-white">
-//       <Header />
-//       <MainContent /> {/* Render the MainContent component */}
-//       <Footer />
-//     </div>
-//   );
-// }
-
-// export default App;
-// \`\`\`
-
-// **2. \`src/components/Header.tsx\`**
-
-// \`\`\`tsx
-// import React from 'react';
-// import { Brain } from 'lucide-react'; // Using Brain icon for consultancy
-// import logo from './assets/logo.png';
-
-// function Header() {
-//   return (
-//     <header className="py-4 bg-white shadow-md">
-//       <div className="container flex items-center justify-between px-6 mx-auto">
-//         <a href="/" className="flex items-center text-2xl font-semibold">
-//           <img src={logo} alt="Consultancy Logo" className="w-8 h-8 mr-2" />
-//           Acme Consultancy
-//         </a>
-//         <nav>
-//           <ul className="flex space-x-6">
-//             <li><a href="/" className="hover:text-blue-500">Home</a></li>
-//             <li><a href="/services" className="hover:text-blue-500">Services</a></li>
-//             <li><a href="/about" className="hover:text-blue-500">About</a></li>
-//             <li><a href="/contact" className="hover:text-blue-500">Contact</a></li>
-//           </ul>
-//         </nav>
-//         <button className="px-4 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700 focus:outline-none focus:shadow-outline">
-//           Get a Quote
-//         </button>
-//       </div>
-//     </header>
-//   );
-// }
-
-// export default Header;
-// \`\`\`
-
-// **6. \`src/index.css\`**
-
-// \`\`\`css
-// @tailwind base;
-// @tailwind components;
-// @tailwind utilities;
-// \`\`\``;
-
-// Parse the files
-
-// Export for use in other modules
 export default parseFileStructure;
