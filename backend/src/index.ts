@@ -46,7 +46,7 @@ app.post("/template", async (req, res) => {
         console.log("This is answer:",answer?.trim())
     if (answer?.trim() == "react") {
         res.json({
-            prompts: [BASE_PROMPT, `Here is an artifact that contains all files of the project visible to you.\nConsider the contents of ALL files in the project.\n\n ${MessageFormat}\n\n${reactBasePrompt}\n\nHere is a list of files that exist on the file system but are not being shown to you:\n\n  - .gitignore\n  - package-lock.json\n`],
+            prompts: [BASE_PROMPT, `Here is an artifact that contains all files of the project visible to you.\nConsider the contents of ALL files in the project.Make sure to make website responsive and beautiful as if it is made by one of the best ui ux designers.\n\n ${MessageFormat}\n\n${reactBasePrompt}\n\nHere is a list of files that exist on the file system but are not being shown to you:\n\n  - .gitignore\n  - package-lock.json\n`],
             uiPrompts: [reactBasePrompt]
         })
         return;

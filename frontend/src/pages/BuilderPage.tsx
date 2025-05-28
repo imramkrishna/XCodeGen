@@ -16,7 +16,6 @@ import { saveAs } from 'file-saver';
 
 const BuilderPage = () => {
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-  console.log("backendurl: ",BACKEND_URL)
   const location = useLocation();
   const [currentStep, setCurrentStep] = useState(1);
   const { inputValue } = location.state as { inputValue: string }
@@ -135,7 +134,7 @@ const BuilderPage = () => {
         content
       }))
     })
-    console.log("Steps response: ", stepsResponse.data.response)
+    
     setSteps(s => [...s, ...parseFileStructure(stepsResponse.data.response).map(x => ({
       ...x,
       status: "pending" as "pending"
