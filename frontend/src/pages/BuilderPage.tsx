@@ -10,8 +10,9 @@ import { BACKEND_URL } from '../config';
 import { Step, StepType } from '../components/builder/StepsList';
 import { parseXml } from '../steps';
 import { FileItem } from '../types';
-import { useRef } from 'react';
 import parseFileStructure from '../xmlParser';
+import JSZip from 'jszip';
+import { saveAs } from 'file-saver';
 
 const BuilderPage = () => {
   const location = useLocation();
@@ -24,6 +25,7 @@ const BuilderPage = () => {
   const [activeTab, setActiveTab] = useState<'code' | 'preview'>('code');
   const [selectedFile, setSelectedFile] = useState<FileItem | null>(null);
   const [showCommand, setShowCommand] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   // Mock steps for the generation process
   const [steps, setSteps] = useState<Step[]>([])
@@ -146,6 +148,45 @@ const BuilderPage = () => {
     }
     fetchApi();
   }, [])
+
+  const isProjectComplete = steps.length > 0 && !steps.some(step => step.status === 'pending');
+
+  const handleDownloadProject = async () => {
+    if (isDownloading) return;
+
+    try {
+      setIsDownloading(true);
+      const zip = new JSZip();
+
+      // Function to recursively add files to zip
+      const addFilesToZip = (items: FileItem[], currentPath = '') => {
+        items.forEach(item => {
+          const itemPath = currentPath ? `${currentPath}/${item.name}` : item.name;
+
+          if (item.type === 'file') {
+            zip.file(itemPath, item.content || '');
+          } else if (item.type === 'folder' && item.children) {
+            // Create folder
+            const folder = zip.folder(itemPath);
+            // Add its children
+            addFilesToZip(item.children, itemPath);
+          }
+        });
+      };
+
+      // Add all files and folders to zip
+      addFilesToZip(files);
+
+      // Generate zip and trigger download
+      const zipContent = await zip.generateAsync({ type: 'blob' });
+      saveAs(zipContent, 'project.zip');
+    } catch (error) {
+      console.error('Failed to download project:', error);
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-slate-900">
       <Header />
@@ -169,7 +210,30 @@ const BuilderPage = () => {
           {/* Steps list with proper overflow */}
           <div className="flex-1 min-h-0 overflow-y-auto">
             <div className="p-4">
-              <h3 className="mb-2 text-sm font-medium text-slate-300">Build Steps</h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-medium text-slate-200">Build Progress</h3>
+                <span className="px-2 py-1 text-xs font-medium text-blue-300 rounded-full bg-blue-900/30">
+                  {steps.filter(s => s.status === "completed").length}/{steps.length} Complete
+                </span>
+              </div>
+
+              {/* Introduction message */}
+              {steps.length > 0 && steps[0].description && (
+                <div className="p-4 mb-6 border rounded-lg shadow-lg bg-gradient-to-br from-slate-800 to-slate-900 border-slate-700/50">
+                  <div className="flex items-start">
+                    <div className="p-1.5 rounded-md bg-blue-500/20 text-blue-400 mr-3 mt-0.5">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-slate-200 mb-1.5">Your Design Plan</h4>
+                      <p className="text-sm leading-relaxed text-slate-400">{steps[0].description}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <StepsList
                 steps={steps}
                 currentStep={currentStep}
@@ -226,6 +290,37 @@ const BuilderPage = () => {
               >
                 <Eye className="w-4 h-4 mr-2" />
                 Preview
+              </button>
+            </div>
+
+            {/* Download button */}
+            <div className="ml-auto">
+              <button
+                className={`flex items-center px-4 py-2 rounded-md transition-colors ${
+                  !isProjectComplete
+                    ? 'bg-slate-600 text-slate-400 cursor-not-allowed'
+                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                }`}
+                onClick={handleDownloadProject}
+                disabled={!isProjectComplete || isDownloading}
+                title={!isProjectComplete ? "Complete all steps to download" : "Download project files"}
+              >
+                {isDownloading ? (
+                  <>
+                    <svg className="w-4 h-4 mr-2 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Preparing...
+                  </>
+                ) : (
+                  <>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Download Project
+                  </>
+                )}
               </button>
             </div>
           </div>
