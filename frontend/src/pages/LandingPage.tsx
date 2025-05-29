@@ -4,6 +4,7 @@ import { ArrowRight, Code, Layout, Terminal, Wand2 } from 'lucide-react';
 import Header from '../components/common/Header';
 import Footer from '../components/common/Footer';
 
+
 const LandingPage = () => {
   const [inputValue, setInputValue] = useState('');
   const navigate = useNavigate();

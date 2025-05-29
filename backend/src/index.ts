@@ -40,10 +40,9 @@ app.post("/template", async (req, res) => {
     */
    const response = await ai.models.generateContent({
             model: "gemini-2.0-flash",
-            contents: prompt+"Return either node or react based on what do you think this project should be in .Only return a single string word either 'node' or 'react'. onot return anything extra.",
+            contents: prompt+"Return either node or react based on what do you think this project should be in .Only return a single string word either 'node' or 'react' or 'other' if it is other types of projects.. Donot return anything extra.",
         });
         let answer=response.text;
-        console.log("This is answer:",answer?.trim())
     if (answer?.trim() == "react") {
         res.json({
             prompts: [BASE_PROMPT, `Here is an artifact that contains all files of the project visible to you.\nConsider the contents of ALL files in the project.Make sure to make website responsive and beautiful as if it is made by one of the best ui ux designers.\n\n ${MessageFormat}\n\n${reactBasePrompt}\n\nHere is a list of files that exist on the file system but are not being shown to you:\n\n  - .gitignore\n  - package-lock.json\n`],
@@ -60,7 +59,8 @@ app.post("/template", async (req, res) => {
         return;
     }
     res.status(403).json({
-        message: "Sorry this cant be built using current version of this app."
+        prompts:[`Here is an artifact that contains all files of the project visible to you.\nConsider the contents of ALL files in the project.\n\n ${MessageFormat}`],
+        uiPrompts:""
     })
     return;
 })
