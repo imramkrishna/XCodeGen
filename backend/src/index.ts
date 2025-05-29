@@ -10,6 +10,7 @@ import cors from "cors"
 import axios from "axios";
 import { GoogleGenAI } from "@google/genai";
 import { MessageFormat } from "./defaults/message";
+import { fullStackBasePrompt } from "./defaults/fullstack";
 dotenv.config()
 const anthropic = new Anthropic({
     apiKey: process.env.CLAUDE_API_KEY
@@ -40,7 +41,7 @@ app.post("/template", async (req, res) => {
     */
    const response = await ai.models.generateContent({
             model: "gemini-2.0-flash",
-            contents: prompt+"Return either node or react based on what do you think this project should be in .Only return a single string word either 'node' or 'react' or 'other' if it is other types of projects.. Donot return anything extra.",
+            contents: prompt+"Return either node,react or fullstack based on what do you think this project should be in.If it is both frontend and backend then return fullstack.Only return a single string word either 'node' or 'react' or 'fullstack'. Donot return anything extra.",
         });
         let answer=response.text;
     if (answer?.trim() == "react") {
@@ -58,9 +59,15 @@ app.post("/template", async (req, res) => {
         })
         return;
     }
+    if (answer?.trim() == "fullstack") {
+        res.json({
+            prompts: [`Here is an artifact that contains all files of the project visible to you.\nConsider the contents of ALL files in the project.\n\n ${MessageFormat}\n\n${fullStackBasePrompt}\n\nHere is a list of files that exist on the file system but are not being shown to you:\n\n`],
+            uiPrompts: [fullStackBasePrompt]
+        })
+        return;
+    }
     res.status(403).json({
-        prompts:[`Here is an artifact that contains all files of the project visible to you.\nConsider the contents of ALL files in the project.\n\n ${MessageFormat}`],
-        uiPrompts:""
+        reponse:"Sorry we could process this request for now."
     })
     return;
 })
