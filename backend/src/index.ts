@@ -12,13 +12,13 @@ import { GoogleGenAI } from "@google/genai";
 import { MessageFormat } from "./defaults/message";
 import { fullStackBasePrompt } from "./defaults/fullstack";
 dotenv.config()
-const anthropic = new Anthropic({
-    apiKey: process.env.CLAUDE_API_KEY
-})
+// const anthropic = new Anthropic({
+//     apiKey: process.env.CLAUDE_API_KEY
+// })
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-});
+// const openai = new OpenAI({
+//     apiKey: process.env.OPENAI_API_KEY,
+// });
 const app = express();
 app.use(express.json())
 app.use(cors())
