@@ -4,7 +4,7 @@ import { StepsList } from '../components/builder/StepsList';
 import { FileExplorer } from '../components/builder/FileExplorer';
 import Header from '../components/common/Header';
 import Editor from '@monaco-editor/react';
-import { Code, Eye, DownloadCloud, Terminal, File, Info } from 'lucide-react';
+import { Code, Eye, DownloadCloud, Terminal, File, Info, Loader } from 'lucide-react';
 import axios from "axios";
 
 import { Step, StepType } from '../components/builder/StepsList';
@@ -33,6 +33,9 @@ const BuilderPage = () => {
 
   // File system structure
   const [files, setFiles] = useState<FileItem[]>([]);
+
+  // Add a new state to track if file is loading
+  const [isFileLoading, setIsFileLoading] = useState(false);
 
   useEffect(() => {
     let originalFiles = [...files];
@@ -140,15 +143,20 @@ const BuilderPage = () => {
       navigate('/');
       return;
     }
-    fetchApi();
+   fetchApi();
   }, []);
+  var isProjectComplete=false;
+  var completedSteps= 0;
+  var progress=0
 
-  const isProjectComplete = steps.length > 0 && !steps.some(step => step.status === 'pending');
-  const completedSteps = steps.filter(s => s.status === "completed").length;
-  const progress = steps.length > 0 ? Math.round((completedSteps / steps.length) * 100) : 0;
+  if(showCommand) {
+  var isProjectComplete = steps.length > 0 && !steps.some(step => step.status === 'pending');
+  var completedSteps = steps.filter(s => s.status === "completed").length;
+  var progress = steps.length > 0 ? Math.round((completedSteps / steps.length) * 100) : 0;
+  }
 
   const handleDownloadProject = async () => {
-    if (isDownloading) return;
+    if (isDownloading && !showCommand) return;
 
     try {
       setIsDownloading(true);
@@ -181,6 +189,49 @@ const BuilderPage = () => {
     } finally {
       setIsDownloading(false);
     }
+  };
+
+  // Format code function
+  const formatCode = (code: string | undefined, language: string): string => {
+    if (!code) return '';
+    
+    try {
+      // Basic formatting - improve indentation and spacing
+      let formatted = code;
+      
+      // Remove extra blank lines (more than 2 consecutive)
+      formatted = formatted.replace(/\n{3,}/g, '\n\n');
+      
+      // Add consistent spacing around operators for better readability
+      if (language === 'javascript' || language === 'typescript') {
+        formatted = formatted
+          .replace(/([=+\-*/<>])\s*([^=\s])/g, '$1 $2')  // Space after operators
+          .replace(/([^=\s])\s*([=+\-*/<>])/g, '$1 $2'); // Space before operators
+      }
+      
+      return formatted;
+    } catch (error) {
+      console.error('Error formatting code:', error);
+      return code;
+    }
+  };
+
+  // Modify the file selection handler
+  const handleFileSelect = (file: FileItem) => {
+    setIsFileLoading(true);
+    
+    // Format the file content before displaying it
+    if (file.content) {
+      const language = getFileLanguage(file.name);
+      file.content = formatCode(file.content, language);
+    }
+    
+    setSelectedFile(file);
+    
+    // Hide loading after a small delay
+    setTimeout(() => {
+      setIsFileLoading(false);
+    }, 500);
   };
 
   return (
@@ -360,7 +411,7 @@ const BuilderPage = () => {
                 <div className="py-2">
                   <FileExplorer
                     files={files}
-                    onFileSelect={setSelectedFile}
+                    onFileSelect={handleFileSelect}
                   />
                 </div>
               </div>
@@ -370,29 +421,44 @@ const BuilderPage = () => {
             <div className="flex-grow bg-slate-900/60 backdrop-blur-sm">
               {activeTab === 'code' ? (
                 selectedFile ? (
-                  <Editor
-                    height="100%"
-                    defaultLanguage={getFileLanguage(selectedFile.name)}
-                    value={selectedFile.content}
-                    theme="vs-dark"
-                    options={{
-                      minimap: { enabled: true },
-                      fontSize: 14,
-                      wordWrap: 'on',
-                      scrollBeyondLastLine: false,
-                      smoothScrolling: true,
-                      cursorBlinking: 'smooth',
-                      cursorSmoothCaretAnimation: "on",
-                      renderLineHighlight: 'all',
-                      contextmenu: true,
-                      fontLigatures: true
-                    }}
-                    loading={
-                      <div className="flex items-center justify-center h-full">
-                        <div className="w-8 h-8 border-4 rounded-full border-slate-700 border-t-blue-500 animate-spin"></div>
+                  <div className="relative h-full w-full">
+                    {/* Loading overlay for code editor */}
+                    {(isFileLoading || !showCommand) && (
+                      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-slate-900/90 backdrop-blur-sm">
+                        <div className="w-12 h-12 mb-4 border-4 rounded-full border-slate-700 border-t-blue-500 animate-spin"></div>
+                        <p className="text-base font-medium text-slate-300">
+                          {!showCommand ? 'Generating code...' : 'Loading file...'}
+                        </p>
+                        {!showCommand && (
+                          <p className="mt-2 text-sm text-slate-500">Please wait until generation is complete</p>
+                        )}
                       </div>
-                    }
-                  />
+                    )}
+                    
+                    <Editor
+                      height="100%"
+                      defaultLanguage={getFileLanguage(selectedFile.name)}
+                      value={selectedFile.content}
+                      theme="vs-dark"
+                      options={{
+                        minimap: { enabled: true },
+                        fontSize: 14,
+                        wordWrap: 'on',
+                        scrollBeyondLastLine: false,
+                        smoothScrolling: true,
+                        cursorBlinking: 'smooth',
+                        cursorSmoothCaretAnimation: "on",
+                        renderLineHighlight: 'all',
+                        contextmenu: true,
+                        fontLigatures: true
+                      }}
+                      loading={
+                        <div className="flex items-center justify-center h-full">
+                          <div className="w-8 h-8 border-4 rounded-full border-slate-700 border-t-blue-500 animate-spin"></div>
+                        </div>
+                      }
+                    />
+                  </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center h-full p-8 text-sm text-slate-400">
                     <div className="flex items-center justify-center w-16 h-16 mb-4 rounded-full bg-slate-800">
@@ -403,22 +469,40 @@ const BuilderPage = () => {
                   </div>
                 )
               ) : (
-                files.length > 0 ? (
-                  <iframe
-                    title="Preview"
-                    className="w-full h-full bg-white"
-                    srcDoc={files.find(f => f.name === 'index.html')?.content || ''}
-                    sandbox="allow-scripts allow-same-origin"
-                  />
-                ) : (
-                  <div className="flex flex-col items-center justify-center h-full p-8 text-sm text-slate-400">
-                    <div className="flex items-center justify-center w-16 h-16 mb-4 rounded-full bg-slate-800">
-                      <Eye className="w-8 h-8 text-slate-600" />
+                <div className="relative w-full h-full">
+                  {/* Loading overlay for preview */}
+                  {(!showCommand || progress < 100) && (
+                    <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-slate-900/90 backdrop-blur-sm">
+                      <div className="w-16 h-16 mb-6 border-4 rounded-full border-slate-700 border-t-blue-500 animate-spin"></div>
+                      <h3 className="mb-2 text-xl font-semibold text-slate-200">Building your preview...</h3>
+                      <div className="w-64 h-2 mb-3 overflow-hidden rounded-full bg-slate-700">
+                        <div
+                          className="h-full rounded-full bg-gradient-to-r from-blue-500 to-indigo-500"
+                          style={{ width: `${progress}%`, transition: 'width 0.5s ease-in-out' }}
+                        ></div>
+                      </div>
+                      <p className="text-slate-400">{progress}% complete</p>
+                      <p className="mt-4 text-sm text-slate-500">Preview will be available once generation is complete</p>
                     </div>
-                    <p className="mb-2 text-lg font-medium text-slate-300">No preview available</p>
-                    <p>Files are still being generated</p>
-                  </div>
-                )
+                  )}
+
+                  {files.length > 0 ? (
+                    <iframe
+                      title="Preview"
+                      className="w-full h-full bg-white"
+                      srcDoc={files.find(f => f.name === 'index.html')?.content || ''}
+                      sandbox="allow-scripts allow-same-origin"
+                    />
+                  ) : (
+                    <div className="flex flex-col items-center justify-center h-full p-8 text-sm text-slate-400">
+                      <div className="flex items-center justify-center w-16 h-16 mb-4 rounded-full bg-slate-800">
+                        <Eye className="w-8 h-8 text-slate-600" />
+                      </div>
+                      <p className="mb-2 text-lg font-medium text-slate-300">No preview available</p>
+                      <p>Files are still being generated</p>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
           </div>
