@@ -45,13 +45,13 @@ const Footer = () => {
               Create beautiful websites in seconds using natural language prompts. No coding required.
             </p>
             <div className="flex mt-8 space-x-4">
-              <a href="#" className="flex items-center justify-center transition-all duration-300 rounded-lg w-9 h-9 text-slate-500 hover:text-white hover:bg-slate-800">
+              <a href="https://github.com/imramkrishna/XCodeGen" target='_blank' className="flex items-center justify-center transition-all duration-300 rounded-lg w-9 h-9 text-slate-500 hover:text-white hover:bg-slate-800">
                 <Github className="w-5 h-5" />
               </a>
-              <a href="#" className="flex items-center justify-center transition-all duration-300 rounded-lg w-9 h-9 text-slate-500 hover:text-blue-400 hover:bg-slate-800">
+              <a href="https://x.com/ramkrishnacode" target='_blank' className="flex items-center justify-center transition-all duration-300 rounded-lg w-9 h-9 text-slate-500 hover:text-blue-400 hover:bg-slate-800">
                 <Twitter className="w-5 h-5" />
               </a>
-              <a href="#" className="flex items-center justify-center transition-all duration-300 rounded-lg w-9 h-9 text-slate-500 hover:text-blue-600 hover:bg-slate-800">
+              <a href="https://www.linkedin.com/in/ramkrishnaprofile/" target='_blank' className="flex items-center justify-center transition-all duration-300 rounded-lg w-9 h-9 text-slate-500 hover:text-blue-600 hover:bg-slate-800">
                 <Linkedin className="w-5 h-5" />
               </a>
             </div>
@@ -100,7 +100,7 @@ const Footer = () => {
 
         <div className="flex flex-col items-center justify-between pt-8 mt-8 border-t border-slate-800/70 md:flex-row">
           <p className="text-xs text-slate-500">
-            &copy; {new Date().getFullYear()} Ram Krishna Yadav. All rights reserved.
+            &copy; {new Date().getFullYear()} <a href="https://ramkrishnacode.tech">Ram Krishna Yadav.</a>  All rights reserved.
           </p>
           <div className="flex mt-4 space-x-6 md:mt-0">
             <a href="#" className="text-xs transition-colors text-slate-500 hover:text-slate-200">
