@@ -124,11 +124,13 @@ const BuilderPage = () => {
           content
         }))
       });
+      
 
       setSteps(s => [...s, ...parseFileStructure(stepsResponse.data.response).map(x => ({
         ...x,
         status: "pending" as "pending"
       }))]);
+      console.log("This is steps: ",steps)
 
       setShowCommand(true);
     } catch (error) {
@@ -192,29 +194,12 @@ const BuilderPage = () => {
   };
 
   // Format code function
-  const formatCode = (code: string | undefined, language: string): string => {
-    if (!code) return '';
-    
-    try {
-      // Basic formatting - improve indentation and spacing
-      let formatted = code;
-      
-      // Remove extra blank lines (more than 2 consecutive)
-      formatted = formatted.replace(/\n{3,}/g, '\n\n');
-      
-      // Add consistent spacing around operators for better readability
-      if (language === 'javascript' || language === 'typescript') {
-        formatted = formatted
-          .replace(/([=+\-*/<>])\s*([^=\s])/g, '$1 $2')  // Space after operators
-          .replace(/([^=\s])\s*([=+\-*/<>])/g, '$1 $2'); // Space before operators
-      }
-      
-      return formatted;
-    } catch (error) {
-      console.error('Error formatting code:', error);
-      return code;
-    }
-  };
+ const formatCode = (code: string | undefined, language: string): string => {
+  if (!code) return '';
+  
+  // Just clean up extra blank lines, no operator spacing
+  return code.replace(/\n{3,}/g, '\n\n');
+};
 
   // Modify the file selection handler
   const handleFileSelect = (file: FileItem) => {
@@ -421,7 +406,7 @@ const BuilderPage = () => {
             <div className="flex-grow bg-slate-900/60 backdrop-blur-sm">
               {activeTab === 'code' ? (
                 selectedFile ? (
-                  <div className="relative h-full w-full">
+                  <div className="relative w-full h-full">
                     {/* Loading overlay for code editor */}
                     {(isFileLoading || !showCommand) && (
                       <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-slate-900/90 backdrop-blur-sm">
