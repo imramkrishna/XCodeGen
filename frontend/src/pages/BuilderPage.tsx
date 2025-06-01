@@ -20,7 +20,6 @@ const BuilderPage = () => {
   const location = useLocation();
   const [currentStep, setCurrentStep] = useState(1);
   const { inputValue, selectedModel } = location.state as { inputValue: string, selectedModel: 'mistral' | 'gemini' };
-  console.log("Model", selectedModel)
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'code' | 'preview'>('code');
   const [selectedFile, setSelectedFile] = useState<FileItem | null>(null);

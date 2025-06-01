@@ -12,33 +12,17 @@ import { GoogleGenAI } from "@google/genai";
 import { MessageFormat } from "./defaults/message";
 import { fullStackBasePrompt } from "./defaults/fullstack";
 dotenv.config()
-// const anthropic = new Anthropic({
-//     apiKey: process.env.CLAUDE_API_KEY
-// })
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-// const openai = new OpenAI({
-//     apiKey: process.env.OPENAI_API_KEY,
-// });
+
 const app = express();
 app.use(express.json())
 app.use(cors())
 app.listen(3000, () => {
     console.log("Server is running on port 3000")
+
 })
 app.post("/template", async (req, res) => {
     const prompt = req.body.prompt;
-    /*
-     **** CLAUDE API ****
-    const response = await anthropic.messages.create({
-        model: "claude-3-7-sonnet-20250219",
-        max_tokens: 200,
-        system: "Return either node or react based on what do you think this project should be in .Only return a single string word either 'node' or 'react'. onot return anything extra.",
-        messages: [
-            { "role": "user", "content": prompt }
-        ]
-    });
-    const answer = (response.content[0] as TextBlock).text;
-    */
     const response = await ai.models.generateContent({
         model: "gemini-2.0-flash",
         contents: prompt + "Return either node,react or fullstack based on what do you think this project should be in.If it is both frontend and backend then return fullstack.Only return a single string word either 'node' or 'react' or 'fullstack'. Donot return anything extra.",
@@ -75,48 +59,15 @@ app.post("/chatmistral", async (req, res) => {
     try {
         const messages = req.body.messages
 
-
-
-        // const response = await anthropic.messages.create({
-        //     model: "claude-3-7-sonnet-20250219",
-        //     max_tokens: 10000,
-        //     system: getSystemPrompt(),
-        //     messages: messages
-        // })
-        // console.log(response);
-        // res.json({
-        //     response:response
-        // })
-
-        /*
-         *****FOR CLAUDE LLM ******
-         const response = openai.chat.completions.create({
-             model: "gpt-4o-mini",
-             store: true,
-             messages: messages,
-         });
-         */
-
-        /* 
-        **** FOR GEMINI API *****  */
         console.log("eg of messages:   ", messages)
         let prompt = "";
         messages.map((message: { role: string; content: string }) => {
             prompt += message.content + "\n"
         })
-
-        // const response = await ai.models.generateContent({
-        //     model: "gemini-2.0-flash",
-        //     contents: prompt,
-        // });
-        // console.log(response.text)
-        // res.send({
-        //     response:response.text
-        // })
         const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
             method: "POST",
             headers: {
-                "Authorization": "Bearer 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",
+                "Authorization": `Bearer ${process.env.MISTRAL_API_KEY}`,
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
@@ -133,7 +84,7 @@ app.post("/chatmistral", async (req, res) => {
         res.json({
             response:data.choices[0].message.content
         })
-
+       
 
     } catch (e) {
         console.log("Error while sending response", e)
@@ -145,32 +96,6 @@ app.post("/chatmistral", async (req, res) => {
 app.post("/chatgemini", async (req, res) => {
     try {
         const messages = req.body.messages
-
-
-
-        // const response = await anthropic.messages.create({
-        //     model: "claude-3-7-sonnet-20250219",
-        //     max_tokens: 10000,
-        //     system: getSystemPrompt(),
-        //     messages: messages
-        // })
-        // console.log(response);
-        // res.json({
-        //     response:response
-        // })
-
-        /*
-         *****FOR CLAUDE LLM ******
-         const response = openai.chat.completions.create({
-             model: "gpt-4o-mini",
-             store: true,
-             messages: messages,
-         });
-         */
-
-        /* 
-        **** FOR GEMINI API *****  */
-        console.log("eg of messages:   ", messages)
         let prompt = "";
         messages.map((message: { role: string; content: string }) => {
             prompt += message.content + "\n"
