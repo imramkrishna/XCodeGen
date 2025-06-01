@@ -19,7 +19,7 @@ const BuilderPage = () => {
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
   const location = useLocation();
   const [currentStep, setCurrentStep] = useState(1);
-  const { inputValue, selectedModel } = location.state as { inputValue: string, selectedModel: 'mistral' | 'gemini' };
+  const { inputValue, selectedModel } = location.state as { inputValue: string, selectedModel: 'mistral' | 'gemini' | 'qwen3' | 'llama' };
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'code' | 'preview'>('code');
   const [selectedFile, setSelectedFile] = useState<FileItem | null>(null);
@@ -131,7 +131,7 @@ const BuilderPage = () => {
         }))]);
 
         setShowCommand(true);
-      }else{
+      } else if (selectedModel === 'mistral') {
         const stepsResponse = await axios.post(`${BACKEND_URL}/chatmistral`, {
           messages: [...prompts, inputValue].map(content => ({
             role: "user",
@@ -147,6 +147,42 @@ const BuilderPage = () => {
         console.log("This is steps: ", steps)
 
         setShowCommand(true);
+
+      } else if (selectedModel === 'qwen3') {
+        const stepsResponse = await axios.post(`${BACKEND_URL}/chatqwen`, {
+          messages: [...prompts, inputValue].map(content => ({
+            role: "user",
+            content
+          }))
+        });
+
+
+        setSteps(s => [...s, ...parseFileStructure(stepsResponse.data.response).map(x => ({
+          ...x,
+          status: "pending" as "pending"
+        }))]);
+        console.log("This is steps: ", steps)
+
+        setShowCommand(true);
+
+
+      } else {
+        const stepsResponse = await axios.post(`${BACKEND_URL}/chatllama`, {
+          messages: [...prompts, inputValue].map(content => ({
+            role: "user",
+            content
+          }))
+        });
+
+
+        setSteps(s => [...s, ...parseFileStructure(stepsResponse.data.response).map(x => ({
+          ...x,
+          status: "pending" as "pending"
+        }))]);
+        console.log("This is steps: ", steps)
+
+        setShowCommand(true);
+
 
       }
     } catch (error) {

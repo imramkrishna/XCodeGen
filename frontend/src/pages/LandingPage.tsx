@@ -6,7 +6,7 @@ import Footer from '../components/common/Footer';
 
 const LandingPage = () => {
   const [inputValue, setInputValue] = useState('');
-  const [selectedModel, setSelectedModel] = useState<'mistral' | 'gemini'>('gemini'); // Default to gemini
+  const [selectedModel, setSelectedModel] = useState<'mistral' | 'gemini' | 'qwen3' | 'llama'>('llama'); // Added llama
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -67,11 +67,22 @@ const LandingPage = () => {
                 {/* AI Model Selection */}
                 <div className="mb-4">
                   <p className="mb-2 text-sm font-medium text-slate-300">Select AI Model</p>
-                  <div className="flex p-1 border rounded-lg bg-slate-900/80 border-slate-700/50">
+                  <div className="flex flex-wrap p-1 border rounded-lg bg-slate-900/80 border-slate-700/50">
+                  <button
+                      type="button"
+                      onClick={() => setSelectedModel('llama')}
+                      className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-all duration-200 ${
+                        selectedModel === 'llama'
+                          ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md'
+                          : 'text-slate-400 hover:text-slate-300'
+                      }`}
+                    >
+                      Llama
+                    </button>
                     <button
                       type="button"
                       onClick={() => setSelectedModel('gemini')}
-                      className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
+                      className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-all duration-200 ${
                         selectedModel === 'gemini'
                           ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md'
                           : 'text-slate-400 hover:text-slate-300'
@@ -82,7 +93,7 @@ const LandingPage = () => {
                     <button
                       type="button"
                       onClick={() => setSelectedModel('mistral')}
-                      className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
+                      className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-all duration-200 ${
                         selectedModel === 'mistral'
                           ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md'
                           : 'text-slate-400 hover:text-slate-300'
@@ -90,6 +101,18 @@ const LandingPage = () => {
                     >
                       Mistral
                     </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedModel('qwen3')}
+                      className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-all duration-200 ${
+                        selectedModel === 'qwen3'
+                          ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md'
+                          : 'text-slate-400 hover:text-slate-300'
+                      }`}
+                    >
+                      Qwen3
+                    </button>
+                    
                   </div>
                 </div>
 

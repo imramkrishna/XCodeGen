@@ -80,11 +80,11 @@ app.post("/chatmistral", async (req, res) => {
                 ]
             })
         });
-        const data=await response.json()
+        const data = await response.json()
         res.json({
-            response:data.choices[0].message.content
+            response: data.choices[0].message.content
         })
-       
+
 
     } catch (e) {
         console.log("Error while sending response", e)
@@ -93,6 +93,83 @@ app.post("/chatmistral", async (req, res) => {
         })
     }
 })
+app.post("/chatqwen", async (req, res) => {
+    try {
+        const messages = req.body.messages
+
+        console.log("eg of messages:   ", messages)
+        let prompt = "";
+        messages.map((message: { role: string; content: string }) => {
+            prompt += message.content + "\n"
+        })
+        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${process.env.MISTRAL_API_KEY}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                "model": "qwen/qwen3-30b-a3b:free",
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ]
+            })
+        });
+        const data = await response.json()
+        res.json({
+            response: data.choices[0].message.content
+        })
+
+
+    } catch (e) {
+        console.log("Error while sending response", e)
+        res.json({
+            message: "Error while sending your request"
+        })
+    }
+})
+app.post("/chatllama", async (req, res) => {
+    try {
+        const messages = req.body.messages
+
+        console.log("eg of messages:   ", messages)
+        let prompt = "";
+        messages.map((message: { role: string; content: string }) => {
+            prompt += message.content + "\n"
+        })
+        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${process.env.MISTRAL_API_KEY}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                "model": "shisa-ai/shisa-v2-llama3.3-70b:free",
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ]
+            })
+        });
+        const data = await response.json()
+        res.json({
+            response: data.choices[0].message.content
+        })
+
+
+    } catch (e) {
+        console.log("Error while sending response", e)
+        res.json({
+            message: "Error while sending your request"
+        })
+    }
+})
+
 app.post("/chatgemini", async (req, res) => {
     try {
         const messages = req.body.messages
@@ -107,7 +184,7 @@ app.post("/chatgemini", async (req, res) => {
         });
         console.log(response.text)
         res.json({
-            response:response.text
+            response: response.text
         })
 
 
