@@ -6,12 +6,13 @@ import Footer from '../components/common/Footer';
 
 const LandingPage = () => {
   const [inputValue, setInputValue] = useState('');
+  const [selectedModel, setSelectedModel] = useState<'mistral' | 'gemini'>('gemini'); // Default to gemini
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (inputValue.trim()) {
-      navigate('/builder', { state: { inputValue } });
+      navigate('/builder', { state: { inputValue, selectedModel } });
     }
   };
 
@@ -63,6 +64,35 @@ const LandingPage = () => {
           <div className="relative p-1 shadow-2xl rounded-2xl bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-indigo-500/20">
             <div className="p-6 border md:p-8 bg-slate-800/90 rounded-xl backdrop-blur-xl border-slate-700/50">
               <form onSubmit={handleSubmit} className="space-y-6">
+                {/* AI Model Selection */}
+                <div className="mb-4">
+                  <p className="mb-2 text-sm font-medium text-slate-300">Select AI Model</p>
+                  <div className="flex p-1 border rounded-lg bg-slate-900/80 border-slate-700/50">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedModel('gemini')}
+                      className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
+                        selectedModel === 'gemini'
+                          ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md'
+                          : 'text-slate-400 hover:text-slate-300'
+                      }`}
+                    >
+                      Gemini 2.0 Flash
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedModel('mistral')}
+                      className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
+                        selectedModel === 'mistral'
+                          ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md'
+                          : 'text-slate-400 hover:text-slate-300'
+                      }`}
+                    >
+                      Mistral
+                    </button>
+                  </div>
+                </div>
+
                 <div className="relative group">
                   <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 rounded-xl transform group-hover:scale-[1.01] transition-transform duration-300 blur-sm"></div>
                   <textarea

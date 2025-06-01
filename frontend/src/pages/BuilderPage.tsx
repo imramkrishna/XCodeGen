@@ -19,8 +19,8 @@ const BuilderPage = () => {
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
   const location = useLocation();
   const [currentStep, setCurrentStep] = useState(1);
-  const { inputValue } = location.state as { inputValue: string };
-
+  const { inputValue, selectedModel } = location.state as { inputValue: string, selectedModel: 'mistral' | 'gemini' };
+  console.log("Model", selectedModel)
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'code' | 'preview'>('code');
   const [selectedFile, setSelectedFile] = useState<FileItem | null>(null);
@@ -117,22 +117,39 @@ const BuilderPage = () => {
         ...x,
         status: "pending"
       })));
+      if (selectedModel === 'gemini') {
+        const stepsResponse = await axios.post(`${BACKEND_URL}/chatgemini`, {
+          messages: [...prompts, inputValue].map(content => ({
+            role: "user",
+            content
+          }))
+        });
 
-      const stepsResponse = await axios.post(`${BACKEND_URL}/chat`, {
-        messages: [...prompts, inputValue].map(content => ({
-          role: "user",
-          content
-        }))
-      });
-      
 
-      setSteps(s => [...s, ...parseFileStructure(stepsResponse.data.response).map(x => ({
-        ...x,
-        status: "pending" as "pending"
-      }))]);
-      console.log("This is steps: ",steps)
+        setSteps(s => [...s, ...parseFileStructure(stepsResponse.data.response).map(x => ({
+          ...x,
+          status: "pending" as "pending"
+        }))]);
 
-      setShowCommand(true);
+        setShowCommand(true);
+      }else{
+        const stepsResponse = await axios.post(`${BACKEND_URL}/chatmistral`, {
+          messages: [...prompts, inputValue].map(content => ({
+            role: "user",
+            content
+          }))
+        });
+
+
+        setSteps(s => [...s, ...parseFileStructure(stepsResponse.data.response).map(x => ({
+          ...x,
+          status: "pending" as "pending"
+        }))]);
+        console.log("This is steps: ", steps)
+
+        setShowCommand(true);
+
+      }
     } catch (error) {
       console.error('Error generating project:', error);
     } finally {
@@ -145,16 +162,16 @@ const BuilderPage = () => {
       navigate('/');
       return;
     }
-   fetchApi();
+    fetchApi();
   }, []);
-  var isProjectComplete=false;
-  var completedSteps= 0;
-  var progress=0
+  var isProjectComplete = false;
+  var completedSteps = 0;
+  var progress = 0
 
-  if(showCommand) {
-  var isProjectComplete = steps.length > 0 && !steps.some(step => step.status === 'pending');
-  var completedSteps = steps.filter(s => s.status === "completed").length;
-  var progress = steps.length > 0 ? Math.round((completedSteps / steps.length) * 100) : 0;
+  if (showCommand) {
+    var isProjectComplete = steps.length > 0 && !steps.some(step => step.status === 'pending');
+    var completedSteps = steps.filter(s => s.status === "completed").length;
+    var progress = steps.length > 0 ? Math.round((completedSteps / steps.length) * 100) : 0;
   }
 
   const handleDownloadProject = async () => {
@@ -194,25 +211,25 @@ const BuilderPage = () => {
   };
 
   // Format code function
- const formatCode = (code: string | undefined, language: string): string => {
-  if (!code) return '';
-  
-  // Just clean up extra blank lines, no operator spacing
-  return code.replace(/\n{3,}/g, '\n\n');
-};
+  const formatCode = (code: string | undefined, language: string): string => {
+    if (!code) return '';
+
+    // Just clean up extra blank lines, no operator spacing
+    return code.replace(/\n{3,}/g, '\n\n');
+  };
 
   // Modify the file selection handler
   const handleFileSelect = (file: FileItem) => {
     setIsFileLoading(true);
-    
+
     // Format the file content before displaying it
     if (file.content) {
       const language = getFileLanguage(file.name);
       file.content = formatCode(file.content, language);
     }
-    
+
     setSelectedFile(file);
-    
+
     // Hide loading after a small delay
     setTimeout(() => {
       setIsFileLoading(false);
@@ -419,7 +436,7 @@ const BuilderPage = () => {
                         )}
                       </div>
                     )}
-                    
+
                     <Editor
                       height="100%"
                       defaultLanguage={getFileLanguage(selectedFile.name)}

@@ -39,11 +39,11 @@ app.post("/template", async (req, res) => {
     });
     const answer = (response.content[0] as TextBlock).text;
     */
-   const response = await ai.models.generateContent({
-            model: "gemini-2.0-flash",
-            contents: prompt+"Return either node,react or fullstack based on what do you think this project should be in.If it is both frontend and backend then return fullstack.Only return a single string word either 'node' or 'react' or 'fullstack'. Donot return anything extra.",
-        });
-        let answer=response.text;
+    const response = await ai.models.generateContent({
+        model: "gemini-2.0-flash",
+        contents: prompt + "Return either node,react or fullstack based on what do you think this project should be in.If it is both frontend and backend then return fullstack.Only return a single string word either 'node' or 'react' or 'fullstack'. Donot return anything extra.",
+    });
+    let answer = response.text;
     if (answer?.trim() == "react") {
         res.json({
             prompts: [BASE_PROMPT, `Here is an artifact that contains all files of the project visible to you.\nConsider the contents of ALL files in the project.Make sure to make website responsive and beautiful as if it is made by one of the best ui ux designers.\n\n ${MessageFormat}\n\n${reactBasePrompt}\n\nHere is a list of files that exist on the file system but are not being shown to you:\n\n  - .gitignore\n  - package-lock.json\n`],
@@ -67,11 +67,11 @@ app.post("/template", async (req, res) => {
         return;
     }
     res.status(403).json({
-        reponse:"Sorry we could process this request for now."
+        reponse: "Sorry we could process this request for now."
     })
     return;
 })
-app.post("/chat", async (req, res) => {
+app.post("/chatmistral", async (req, res) => {
     try {
         const messages = req.body.messages
 
@@ -99,22 +99,93 @@ app.post("/chat", async (req, res) => {
 
         /* 
         **** FOR GEMINI API *****  */
-       console.log("eg of messages:   ",messages)
-       let prompt="";
-       messages.map((message: { role: string; content: string })=>{
-        prompt+=message.content +"\n"
-       })
-        
+        console.log("eg of messages:   ", messages)
+        let prompt = "";
+        messages.map((message: { role: string; content: string }) => {
+            prompt += message.content + "\n"
+        })
+
+        // const response = await ai.models.generateContent({
+        //     model: "gemini-2.0-flash",
+        //     contents: prompt,
+        // });
+        // console.log(response.text)
+        // res.send({
+        //     response:response.text
+        // })
+        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer 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",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                "model": "mistralai/devstral-small:free",
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ]
+            })
+        });
+        const data=await response.json()
+        res.json({
+            response:data.choices[0].message.content
+        })
+
+
+    } catch (e) {
+        console.log("Error while sending response", e)
+        res.json({
+            message: "Error while sending your request"
+        })
+    }
+})
+app.post("/chatgemini", async (req, res) => {
+    try {
+        const messages = req.body.messages
+
+
+
+        // const response = await anthropic.messages.create({
+        //     model: "claude-3-7-sonnet-20250219",
+        //     max_tokens: 10000,
+        //     system: getSystemPrompt(),
+        //     messages: messages
+        // })
+        // console.log(response);
+        // res.json({
+        //     response:response
+        // })
+
+        /*
+         *****FOR CLAUDE LLM ******
+         const response = openai.chat.completions.create({
+             model: "gpt-4o-mini",
+             store: true,
+             messages: messages,
+         });
+         */
+
+        /* 
+        **** FOR GEMINI API *****  */
+        console.log("eg of messages:   ", messages)
+        let prompt = "";
+        messages.map((message: { role: string; content: string }) => {
+            prompt += message.content + "\n"
+        })
+
         const response = await ai.models.generateContent({
             model: "gemini-2.0-flash",
             contents: prompt,
         });
         console.log(response.text)
-        res.send({
+        res.json({
             response:response.text
         })
-             
-    
+
+
     } catch (e) {
         console.log("Error while sending response", e)
         res.json({
