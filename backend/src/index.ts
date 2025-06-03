@@ -11,6 +11,7 @@ import axios from "axios";
 import { GoogleGenAI } from "@google/genai";
 import { MessageFormat } from "./defaults/message";
 import { fullStackBasePrompt } from "./defaults/fullstack";
+import { chatMessage } from "./defaults/chatMessage";
 dotenv.config()
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
@@ -75,7 +76,7 @@ app.post("/chatmistral", async (req, res) => {
                 "messages": [
                     {
                         "role": "user",
-                        "content": prompt
+                        "content": chatMessage+prompt
                     }
                 ]
             })
@@ -97,7 +98,7 @@ app.post("/chatqwen", async (req, res) => {
     try {
         const messages = req.body.messages
 
-        console.log("eg of messages:   ", messages)
+        console.log("eg of messages: ", messages)
         let prompt = "";
         messages.map((message: { role: string; content: string }) => {
             prompt += message.content + "\n"
@@ -147,7 +148,7 @@ app.post("/chatllama", async (req, res) => {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                "model": "shisa-ai/shisa-v2-llama3.3-70b:free",
+                "model": "meta-llama/llama-4-scout:free",
                 "messages": [
                     {
                         "role": "user",
@@ -195,4 +196,43 @@ app.post("/chatgemini", async (req, res) => {
         })
     }
 })
+app.post("/chatmode",async (req,res)=>{
+    try {
+        const messages = req.body.messages
 
+        console.log("eg of messages:   ", messages)
+        let prompt = "";
+        messages.map((message: { role: string; content: string }) => {
+            prompt += message.content + "\n"
+        })
+        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${process.env.MISTRAL_API_KEY}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                "model": "microsoft/mai-ds-r1:free",
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ],
+                temperature:0
+            })
+        });
+        const data = await response.json()
+        console.log("Response from ai: ",data)
+        res.json({
+            response: data.choices[0].message.content
+        })
+
+
+    } catch (e) {
+        console.log("Error while sending response", e)
+        res.json({
+            message: "Error while sending your request"
+        })
+    }
+})
