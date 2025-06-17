@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+:root {
+  --bg-primary: #111827;
+  --bg-secondary: #111827;
+}
+
+body {
+  background-color: var(--bg-primary);
+}
+
+.container {
+  background-color: var(--bg-primary);
+}
