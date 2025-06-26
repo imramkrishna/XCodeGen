@@ -3,13 +3,14 @@ import { Wand2, Github, Twitter, Linkedin, ExternalLink } from 'lucide-react';
 
 const Footer = () => {
   return (
-    <footer className="relative overflow-hidden border-t bg-slate-900 text-slate-400 border-slate-800">
+    <footer className="relative w-full overflow-hidden border-t bg-slate-900 text-slate-400 border-slate-800">
       {/* Decorative background elements */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,_rgba(59,130,246,0.04)_0%,_rgba(59,130,246,0)_50%)]"></div>
       <div className="absolute w-64 h-64 rounded-full pointer-events-none bg-blue-500/5 blur-3xl -top-32 -right-32"></div>
       <div className="absolute w-64 h-64 rounded-full pointer-events-none bg-purple-500/5 blur-3xl -bottom-32 -left-32"></div>
 
-      <div className="container relative z-10 px-4 py-16 mx-auto">
+      {/* CHANGED: Remove 'container' class and use full width with padding */}
+      <div className="relative z-10 w-full px-4 py-16 mx-auto max-w-none">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
           <div className="md:col-span-1">
             <div className="flex items-center mb-6 space-x-3 group">
@@ -76,8 +77,8 @@ const Footer = () => {
           />
         </div>
 
-        {/* Newsletter signup */}
-        <div className="p-6 mt-12 mb-10 border rounded-2xl bg-slate-800/50 backdrop-blur-sm border-slate-700/50">
+        {/* Newsletter signup - also ensure full width */}
+        <div className="w-full p-6 mt-12 mb-10 border rounded-2xl bg-slate-800/50 backdrop-blur-sm border-slate-700/50">
           <div className="grid items-center grid-cols-1 gap-6 md:grid-cols-3">
             <div className="md:col-span-1">
               <h4 className="text-lg font-medium text-white">Stay in the loop</h4>
@@ -98,7 +99,8 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-between pt-8 mt-8 border-t border-slate-800/70 md:flex-row">
+        {/* Footer bottom - ensure full width */}
+        <div className="flex flex-col items-center justify-between w-full pt-8 mt-8 border-t border-slate-800/70 md:flex-row">
           <p className="text-xs text-slate-500">
             &copy; {new Date().getFullYear()} <a href="https://ramkrishnacode.tech">Ram Krishna Yadav.</a>  All rights reserved.
           </p>
@@ -143,8 +145,8 @@ const FooterColumn: React.FC<FooterColumnProps> = ({ title, items, highlight, ba
           <a
             href="#"
             className={`group flex items-center text-sm transition-colors ${item === highlight
-                ? 'text-blue-400 hover:text-blue-300'
-                : 'text-slate-400 hover:text-slate-200'
+              ? 'text-blue-400 hover:text-blue-300'
+              : 'text-slate-400 hover:text-slate-200'
               }`}
           >
             {item}
