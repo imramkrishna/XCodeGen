@@ -3,11 +3,11 @@ import { Wand2, Github, Twitter, Linkedin, ExternalLink } from 'lucide-react';
 
 const Footer = () => {
   return (
-    <footer className="relative w-full overflow-hidden border-t bg-slate-900 text-slate-400 border-slate-800">
+    <footer className="relative w-full overflow-hidden text-gray-400 bg-black border-t border-gray-800">
       {/* Decorative background elements */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,_rgba(59,130,246,0.04)_0%,_rgba(59,130,246,0)_50%)]"></div>
-      <div className="absolute w-64 h-64 rounded-full pointer-events-none bg-blue-500/5 blur-3xl -top-32 -right-32"></div>
-      <div className="absolute w-64 h-64 rounded-full pointer-events-none bg-purple-500/5 blur-3xl -bottom-32 -left-32"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/5 to-transparent"></div>
+      <div className="absolute w-64 h-64 rounded-full pointer-events-none bg-blue-500/10 blur-3xl -top-32 -right-32"></div>
+      <div className="absolute w-64 h-64 rounded-full pointer-events-none bg-purple-500/10 blur-3xl -bottom-32 -left-32"></div>
 
       {/* CHANGED: Remove 'container' class and use full width with padding */}
       <div className="relative z-10 w-full px-4 py-16 mx-auto max-w-none">
@@ -42,17 +42,17 @@ const Footer = () => {
                 X<span className="text-white">CodeGen</span>
               </span>
             </div>
-            <p className="max-w-xs text-sm leading-relaxed text-slate-400">
+            <p className="max-w-xs text-sm leading-relaxed text-gray-400">
               Create beautiful websites in seconds using natural language prompts. No coding required.
             </p>
             <div className="flex mt-8 space-x-4">
-              <a href="https://github.com/imramkrishna/XCodeGen" target='_blank' className="flex items-center justify-center transition-all duration-300 rounded-lg w-9 h-9 text-slate-500 hover:text-white hover:bg-slate-800">
+              <a href="https://github.com/imramkrishna/XCodeGen" target='_blank' className="flex items-center justify-center text-gray-500 transition-all duration-300 rounded-lg w-9 h-9 hover:text-white hover:bg-gray-800">
                 <Github className="w-5 h-5" />
               </a>
-              <a href="https://x.com/ramkrishnacode" target='_blank' className="flex items-center justify-center transition-all duration-300 rounded-lg w-9 h-9 text-slate-500 hover:text-blue-400 hover:bg-slate-800">
+              <a href="https://x.com/ramkrishnacode" target='_blank' className="flex items-center justify-center text-gray-500 transition-all duration-300 rounded-lg w-9 h-9 hover:text-blue-400 hover:bg-gray-800">
                 <Twitter className="w-5 h-5" />
               </a>
-              <a href="https://www.linkedin.com/in/ramkrishnaprofile/" target='_blank' className="flex items-center justify-center transition-all duration-300 rounded-lg w-9 h-9 text-slate-500 hover:text-blue-600 hover:bg-slate-800">
+              <a href="https://www.linkedin.com/in/ramkrishnaprofile/" target='_blank' className="flex items-center justify-center text-gray-500 transition-all duration-300 rounded-lg w-9 h-9 hover:text-blue-600 hover:bg-gray-800">
                 <Linkedin className="w-5 h-5" />
               </a>
             </div>
@@ -78,20 +78,20 @@ const Footer = () => {
         </div>
 
         {/* Newsletter signup - also ensure full width */}
-        <div className="w-full p-6 mt-12 mb-10 border rounded-2xl bg-slate-800/50 backdrop-blur-sm border-slate-700/50">
+        <div className="w-full p-6 mt-12 mb-10 border rounded-2xl bg-gray-800/50 backdrop-blur-sm border-gray-700/50">
           <div className="grid items-center grid-cols-1 gap-6 md:grid-cols-3">
             <div className="md:col-span-1">
               <h4 className="text-lg font-medium text-white">Stay in the loop</h4>
-              <p className="mt-1 text-sm text-slate-400">Get updates about new features and releases</p>
+              <p className="mt-1 text-sm text-gray-400">Get updates about new features and releases</p>
             </div>
             <div className="md:col-span-2">
               <form className="flex flex-wrap gap-3 sm:flex-nowrap">
                 <input
                   type="email"
                   placeholder="Enter your email"
-                  className="flex-1 w-full px-4 py-3 text-sm border rounded-lg bg-slate-900 border-slate-700 text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  className="flex-1 w-full px-4 py-3 text-sm text-gray-200 bg-gray-900 border border-gray-700 rounded-lg placeholder:text-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 />
-                <button className="w-full px-5 py-3 text-sm font-medium text-white transition-all rounded-lg sm:w-auto bg-gradient-to-r from-blue-500 to-indigo-600 hover:shadow-lg hover:shadow-blue-500/20 focus:outline-none focus:ring-2 focus:ring-blue-500/50">
+                <button className="w-full px-5 py-3 text-sm font-medium text-white transition-all rounded-lg sm:w-auto bg-gradient-to-r from-blue-500 to-blue-700 hover:shadow-lg hover:shadow-blue-500/20 focus:outline-none focus:ring-2 focus:ring-blue-500/50">
                   Subscribe
                 </button>
               </form>
@@ -100,18 +100,18 @@ const Footer = () => {
         </div>
 
         {/* Footer bottom - ensure full width */}
-        <div className="flex flex-col items-center justify-between w-full pt-8 mt-8 border-t border-slate-800/70 md:flex-row">
-          <p className="text-xs text-slate-500">
+        <div className="flex flex-col items-center justify-between w-full pt-8 mt-8 border-t border-gray-800/70 md:flex-row">
+          <p className="text-xs text-gray-500">
             &copy; {new Date().getFullYear()} <a href="https://ramkrishnacode.tech">Ram Krishna Yadav.</a>  All rights reserved.
           </p>
           <div className="flex mt-4 space-x-6 md:mt-0">
-            <a href="#" className="text-xs transition-colors text-slate-500 hover:text-slate-200">
+            <a href="#" className="text-xs text-gray-500 transition-colors hover:text-gray-200">
               Privacy Policy
             </a>
-            <a href="#" className="text-xs transition-colors text-slate-500 hover:text-slate-200">
+            <a href="#" className="text-xs text-gray-500 transition-colors hover:text-gray-200">
               Terms of Service
             </a>
-            <a href="#" className="text-xs transition-colors text-slate-500 hover:text-slate-200">
+            <a href="#" className="text-xs text-gray-500 transition-colors hover:text-gray-200">
               Cookie Policy
             </a>
           </div>
@@ -146,7 +146,7 @@ const FooterColumn: React.FC<FooterColumnProps> = ({ title, items, highlight, ba
             href="#"
             className={`group flex items-center text-sm transition-colors ${item === highlight
               ? 'text-blue-400 hover:text-blue-300'
-              : 'text-slate-400 hover:text-slate-200'
+              : 'text-gray-400 hover:text-gray-200'
               }`}
           >
             {item}

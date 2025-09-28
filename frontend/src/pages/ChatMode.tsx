@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, User, Bot, Copy, CheckCheck, ThumbsUp, ThumbsDown, Code, TerminalSquare, MessageSquare, Info, List } from 'lucide-react';
+import { Send, Bot, ThumbsUp, Code, MessageSquare, Info, List, Plus, Home, Search, Settings, User } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
-import Header from '../components/common/Header';
+
 import { parseChat, type ParsedChatResult, type CodeBlock, type Section, type ListItem } from '../chatParser';
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -23,8 +23,6 @@ export function ChatMode() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
-  const [copiedCodeBlock, setCopiedCodeBlock] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const initialRequestSent = useRef(false);
   
@@ -101,17 +99,7 @@ export function ChatMode() {
     }
   };
 
-  const copyToClipboard = (text: string, index: number) => {
-    navigator.clipboard.writeText(text);
-    setCopiedIndex(index);
-    setTimeout(() => setCopiedIndex(null), 2000);
-  };
-  
-  const copyCodeBlock = (code: string, id: string) => {
-    navigator.clipboard.writeText(code);
-    setCopiedCodeBlock(id);
-    setTimeout(() => setCopiedCodeBlock(null), 2000);
-  };
+
 
   // Auto scroll to bottom when messages change
   useEffect(() => {
@@ -120,28 +108,12 @@ export function ChatMode() {
   
   // Render a code block with syntax highlighting
   const renderCodeBlock = (block: CodeBlock) => (
-    <div key={block.id} className="relative mt-4 mb-6 overflow-hidden rounded-lg">
-      <div className="flex items-center justify-between px-4 py-2 text-xs bg-[#112240] text-gray-300">
+    <div key={block.id} className="relative mt-4 mb-6 overflow-hidden border border-gray-700 rounded-lg">
+      <div className="flex items-center justify-between px-4 py-2 text-xs text-gray-300 bg-gray-800">
         <div className="flex items-center">
-          <Code size={14} className="mr-2 text-blue-400" />
+          <Code size={14} className="mr-2 text-gray-400" />
           <span>{block.language || 'code'}</span>
         </div>
-        <button
-          onClick={() => copyCodeBlock(block.code, block.id)}
-          className="px-2 py-1 text-xs transition-colors rounded hover:bg-[#1e3a5f]"
-        >
-          {copiedCodeBlock === block.id ? (
-            <span className="flex items-center gap-1">
-              <CheckCheck size={14} className="text-green-400" />
-              <span className="text-green-400">Copied!</span>
-            </span>
-          ) : (
-            <span className="flex items-center gap-1">
-              <Copy size={14} />
-              Copy
-            </span>
-          )}
-        </button>
       </div>
       <SyntaxHighlighter
         language={block.language || 'javascript'}
@@ -151,6 +123,7 @@ export function ChatMode() {
           padding: '1rem',
           borderRadius: 0,
           fontSize: '0.9rem',
+          backgroundColor: '#1a1a1a',
         }}
       >
         {block.code}
@@ -205,10 +178,13 @@ export function ChatMode() {
               a: ({node, ...props}) => <a className="text-blue-400 underline hover:text-blue-300" target="_blank" rel="noopener noreferrer" {...props} />,
               strong: ({node, ...props}) => <strong className="font-semibold text-white" {...props} />,
               em: ({node, ...props}) => <em className="italic text-gray-200" {...props} />,
-              code: ({node, inline, ...props}) => 
-                inline ? 
-                <code className="px-1 py-0.5 rounded bg-[#1e2235] text-pink-400 text-sm" {...props} /> :
-                <code {...props} />
+              code: ({node, ...props}) => {
+                const { className } = props;
+                const isInline = !className || !className.includes('language-');
+                return isInline ? 
+                  <code className="px-1 py-0.5 rounded bg-gray-800 text-pink-400 text-sm" {...props} /> :
+                  <code {...props} />
+              }
             }}
           >
             {section.content}
@@ -237,10 +213,13 @@ export function ChatMode() {
               p: ({node, ...props}) => <p className="mb-3 leading-relaxed" {...props} />,
               a: ({node, ...props}) => <a className="text-blue-400 underline hover:text-blue-300" target="_blank" rel="noopener noreferrer" {...props} />,
               strong: ({node, ...props}) => <strong className="font-semibold text-white" {...props} />,
-              code: ({node, inline, ...props}) => 
-                inline ? 
-                <code className="px-1 py-0.5 rounded bg-[#1e2235] text-pink-400 text-sm" {...props} /> :
-                <code {...props} />
+              code: ({node, ...props}) => {
+                const { className } = props;
+                const isInline = !className || !className.includes('language-');
+                return isInline ? 
+                  <code className="px-1 py-0.5 rounded bg-gray-800 text-pink-400 text-sm" {...props} /> :
+                  <code {...props} />
+              }
             }}
           >
             {parsedContent.introduction}
@@ -279,45 +258,72 @@ export function ChatMode() {
   );
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-[#0c1019] to-[#131b2e]">
-      <Header />
+    <div className="flex h-screen text-white" style={{ backgroundColor: '#181a1b' }}>
+      {/* Left Sidebar - Fixed Position */}
+      <div className="flex flex-col w-64 h-full border-r border-gray-700" style={{ backgroundColor: '#181a1b' }}>
+        {/* Sidebar Header */}
+        <div className="p-4 border-b border-gray-700">
+          <div className="flex items-center gap-3">
+            <img src="/hexadev.svg" alt="XCodeGen" className="w-8 h-8 rounded-full" />
+            <span className="font-medium text-white">XCodeGen</span>
+          </div>
+        </div>
+
+        {/* New Chat Button */}
+        <div className="p-4">
+          <button className="flex items-center w-full gap-3 px-4 py-2 text-left text-gray-300 transition-colors bg-gray-700 rounded-lg hover:bg-gray-600">
+            <Plus size={16} />
+            <span>New Thread</span>
+          </button>
+        </div>
+
+        {/* Navigation Items */}
+        <div className="flex-1 px-4 pb-4">
+          <div className="space-y-1">
+            <button className="flex items-center w-full gap-3 px-3 py-2 text-left text-gray-300 transition-colors rounded-lg hover:bg-gray-700">
+              <Home size={16} />
+              <span>Home</span>
+            </button>
+            <button className="flex items-center w-full gap-3 px-3 py-2 text-left text-gray-300 transition-colors rounded-lg hover:bg-gray-700">
+              <Search size={16} />
+              <span>Discover</span>
+            </button>
+            <button className="flex items-center w-full gap-3 px-3 py-2 text-left text-gray-300 transition-colors rounded-lg hover:bg-gray-700">
+              <MessageSquare size={16} />
+              <span>Spaces</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Bottom Section */}
+        <div className="p-4 border-t border-gray-700">
+          <button className="flex items-center w-full gap-3 px-3 py-2 text-left text-gray-300 transition-colors rounded-lg hover:bg-gray-700">
+            <Settings size={16} />
+            <span>Settings</span>
+          </button>
+          <button className="flex items-center w-full gap-3 px-3 py-2 mt-1 text-left text-gray-300 transition-colors rounded-lg hover:bg-gray-700">
+            <User size={16} />
+            <span>Sign In</span>
+          </button>
+        </div>
+      </div>
       
       {/* Main content */}
-      <div className="flex flex-col flex-grow w-full mt-16">
+      <div className="flex flex-col flex-grow h-full overflow-hidden">
         {/* Welcome message if no messages yet */}
         {messages.length === 0 && (
-          <div className="flex flex-col items-center justify-center flex-grow p-8 text-center">
-            <div className="relative flex items-center justify-center w-20 h-20 mb-6">
-              <div className="absolute w-20 h-20 rounded-full bg-blue-500/20 animate-ping"></div>
-              <div className="flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600">
-                <Bot size={32} className="text-white" />
+          <div className="flex flex-col items-center justify-center flex-grow px-4 overflow-y-auto">
+            {/* Header section */}
+            <div className="flex items-center mb-8">
+              <div className="flex items-center justify-center w-8 h-8 mr-3 bg-gray-800 rounded-lg">
+                <Bot size={20} className="text-gray-400" />
               </div>
+              <h1 className="text-2xl font-normal text-white">XCodeGen</h1>
             </div>
-            <h3 className="mb-3 text-2xl font-bold text-white">How can I help you today?</h3>
-            <p className="max-w-md text-gray-400">
-              Ask me anything about code, websites, or any technical questions you might have.
-            </p>
-            <div className="grid max-w-3xl grid-cols-1 gap-3 mt-8 sm:grid-cols-2 md:grid-cols-3">
-              {["Generate a React component", "Write a SQL query for users", "Create a CSS grid layout"].map((suggestion, i) => (
-                <button 
-                  key={i}
-                  onClick={() => {
-                    setInput(suggestion);
-                    setTimeout(() => {
-                      const userMessage = { role: 'user', content: suggestion } as Message;
-                      setMessages([userMessage]);
-                      handleInitialMessage(suggestion);
-                    }, 100);
-                  }}
-                  className="p-4 text-sm text-left transition-all border rounded-xl bg-[#131b2c]/80 border-[#243049] text-gray-300 hover:bg-[#1d2943]/80 hover:border-[#344b70] hover:shadow-lg hover:shadow-blue-900/20"
-                >
-                  <div className="flex items-center mb-1.5">
-                    <TerminalSquare size={14} className="mr-1.5 text-blue-400" />
-                    <span className="font-medium text-blue-300">{suggestion.split(' ')[0]}</span>
-                  </div>
-                  {suggestion}
-                </button>
-              ))}
+            
+            {/* Initial greeting */}
+            <div className="max-w-2xl mb-12 text-center">
+              <p className="mb-2 text-lg text-gray-300">Hello! I'm XCodeGen, your AI coding assistant. How can I help you today?</p>
             </div>
           </div>
         )}
@@ -329,92 +335,65 @@ export function ChatMode() {
               {messages.map((message, index) => (
                 <div 
                   key={index} 
-                  className={`px-4 py-6 md:px-8 lg:px-16 ${
-                    message.role === 'assistant' 
-                      ? 'bg-[#131b2c]/80 backdrop-blur-sm' 
-                      : 'bg-[#0c1019]/90'
-                  } border-b border-[#1e2f4a]`}
+                  className="px-4 py-4 md:px-8 lg:px-16"
                 >
-                  <div className="flex items-start max-w-4xl gap-4 mx-auto">
-                    <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
-                      message.role === 'user' 
-                        ? 'bg-gradient-to-r from-blue-500 to-blue-600' 
-                        : 'bg-gradient-to-r from-indigo-500 to-purple-600'
-                    } shadow-lg shadow-blue-900/20`}>
-                      {message.role === 'user' 
-                        ? <User size={18} className="text-white" /> 
-                        : <Bot size={18} className="text-white" />
-                      }
-                    </div>
-                    <div className="flex-1">
-                      <div className="mb-2 font-medium text-gray-300">
-                        {message.role === 'user' ? 'You' : 'AI Assistant'}
-                      </div>
-                      
-                      {message.role === 'user' ? (
-                        <div className="text-gray-200">
-                          {message.content}
-                        </div>
-                      ) : (
-                        message.parsedContent ? (
-                          renderStructuredContent(message.parsedContent)
-                        ) : (
-                          <div className="text-gray-200 prose prose-invert prose-p:leading-relaxed prose-pre:bg-[#1e2235] prose-pre:border prose-pre:border-[#2a2f45]">
+                  <div className="max-w-4xl mx-auto">
+                    {message.role === 'user' ? (
+                      // User message bubble (right side)
+                      <div className="flex justify-end mb-4">
+                        <div className="flex items-center max-w-xs gap-3 sm:max-w-md md:max-w-lg">
+                          <div className="px-4 py-2 text-white bg-gray-700 rounded-2xl">
                             {message.content}
                           </div>
-                        )
-                      )}
-                      
-                      {/* Actions for assistant messages */}
-                      {message.role === 'assistant' && (
-                        <div className="flex items-center gap-2 mt-4 text-gray-500">
-                          <button 
-                            onClick={() => copyToClipboard(message.content, index)}
-                            className="flex items-center gap-1 px-2 py-1 text-xs transition-colors rounded hover:bg-[#1d2943] hover:text-gray-300"
-                          >
-                            {copiedIndex === index ? (
-                              <>
-                                <CheckCheck size={14} className="text-green-400" />
-                                <span className="text-green-400">Copied!</span>
-                              </>
-                            ) : (
-                              <>
-                                <Copy size={14} />
-                                Copy
-                              </>
-                            )}
-                          </button>
-                          <div className="flex items-center gap-1 ml-1">
-                            <button className="p-1 transition-colors rounded hover:bg-[#1d2943] hover:text-gray-300" aria-label="Thumbs up">
-                              <ThumbsUp size={14} />
-                            </button>
-                            <button className="p-1 transition-colors rounded hover:bg-[#1d2943] hover:text-gray-300" aria-label="Thumbs down">
-                              <ThumbsDown size={14} />
-                            </button>
+                          <div className="flex items-center justify-center flex-shrink-0 w-8 h-8 text-white bg-gray-600 rounded-full">
+                            <span className="text-sm font-medium">RK</span>
                           </div>
                         </div>
-                      )}
-                    </div>
+                      </div>
+                    ) : (
+                      // Assistant message (left side)
+                      <div className="flex items-start gap-3 mb-6">
+                        <div className="flex items-center justify-center flex-shrink-0 w-8 h-8 bg-white rounded-full">
+                          <img src="/hexadev.svg" alt="XCodeGen" className="w-6 h-6" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="mb-2 text-sm font-medium text-gray-300">
+                            XCodeGen
+                          </div>
+                      
+                          <div className="text-gray-200">
+                            {message.parsedContent ? (
+                              renderStructuredContent(message.parsedContent)
+                            ) : (
+                              <div className="prose prose-invert prose-p:leading-relaxed">
+                                {message.content}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
 
               {/* Loading indicator */}
               {loading && (
-                <div className="px-4 py-6 backdrop-blur-sm md:px-8 lg:px-16 bg-[#131b2c]/80 border-b border-[#1e2f4a]">
-                  <div className="flex items-start max-w-4xl gap-4 mx-auto">
-                    <div className="flex items-center justify-center flex-shrink-0 w-10 h-10 rounded-full shadow-lg bg-gradient-to-r from-indigo-500 to-purple-600 shadow-blue-900/20">
-                      <Bot size={18} className="text-white" />
-                    </div>
-                    <div>
-                      <div className="mb-2 font-medium text-gray-300">
-                        AI Assistant
+                <div className="px-4 py-4 md:px-8 lg:px-16">
+                  <div className="max-w-4xl mx-auto">
+                    <div className="flex items-start gap-3 mb-6">
+                      <div className="flex items-center justify-center flex-shrink-0 w-8 h-8 bg-white rounded-full">
+                        <img src="/hexadev.svg" alt="XCodeGen" className="w-6 h-6" />
                       </div>
-                      <div className="flex items-center gap-2 text-gray-400">
-                        <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></div>
-                        <div className="w-2 h-2 delay-150 bg-blue-500 rounded-full animate-pulse"></div>
-                        <div className="w-2 h-2 delay-300 bg-purple-500 rounded-full animate-pulse"></div>
-                        <span className="ml-1 text-sm">Generating response...</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="mb-2 text-sm font-medium text-gray-300">
+                          XCodeGen
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
+                          <div className="w-2 h-2 delay-150 bg-orange-500 rounded-full animate-pulse"></div>
+                          <div className="w-2 h-2 delay-300 bg-orange-500 rounded-full animate-pulse"></div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -426,15 +405,26 @@ export function ChatMode() {
             </div>
 
             {/* Input area */}
-            <div className="sticky bottom-0 p-4 bg-[#0c1019]/95 border-t border-[#1e2f4a] md:p-6 backdrop-blur-md">
+            <div className="sticky bottom-0 p-4 md:p-6" style={{ backgroundColor: '#181a1b' }}>
               <div className="max-w-4xl mx-auto">
                 <form onSubmit={sendMessage} className="relative">
-                  <div className="relative overflow-hidden transition-all duration-200 border rounded-xl bg-[#131b2c] border-[#243049] focus-within:ring-2 focus-within:ring-blue-500/40 focus-within:border-blue-500/60">
+                  <div className="relative flex items-center transition-colors bg-gray-800 border border-gray-600 rounded-xl focus-within:border-gray-500">
+                    <div className="flex items-center gap-2 pl-3">
+                      <button
+                        type="button"
+                        className="p-1.5 text-gray-400 transition-colors hover:text-gray-300"
+                        aria-label="Attach file"
+                      >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+                        </svg>
+                      </button>
+                    </div>
                     <textarea
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
-                      placeholder="Message AI Assistant..."
-                      className="w-full px-4 py-3 text-base resize-none bg-transparent text-gray-100 placeholder:text-gray-500 focus:outline-none min-h-[60px] max-h-[200px]"
+                      placeholder="Ask a follow-up..."
+                      className="flex-1 px-3 py-3 text-base resize-none bg-transparent text-white placeholder:text-gray-400 focus:outline-none min-h-[44px] max-h-[200px]"
                       rows={1}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' && !e.shiftKey) {
@@ -443,23 +433,45 @@ export function ChatMode() {
                         }
                       }}
                     />
-                    <div className="flex items-center justify-between px-3 py-2 border-t border-[#243049]">
-                      <div className="text-xs text-gray-500">
-                        Shift + Enter for new line
-                      </div>
+                    <div className="flex items-center gap-2 pr-2">
+                      <button
+                        type="button"
+                        className="p-1.5 text-gray-400 transition-colors hover:text-gray-300"
+                        aria-label="Attach file"
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+                        </svg>
+                      </button>
+                      <button
+                        type="button"
+                        className="p-1.5 text-gray-400 transition-colors hover:text-gray-300"
+                        aria-label="Voice input"
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                          <line x1="12" y1="19" x2="12" y2="23"/>
+                          <line x1="8" y1="23" x2="16" y2="23"/>
+                        </svg>
+                      </button>
                       <button
                         type="submit"
                         disabled={!input.trim() || loading}
-                        className={`px-4 py-2 flex items-center gap-1.5 rounded-lg shadow-sm transition-all ${
+                        className={`p-2 rounded-md transition-all ${
                           input.trim() && !loading
-                            ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg shadow-blue-900/30'
-                            : 'bg-[#1d2943] text-gray-500 cursor-not-allowed'
+                            ? 'bg-teal-600 hover:bg-teal-700 text-white'
+                            : 'bg-gray-600 text-gray-400 cursor-not-allowed'
                         }`}
                       >
-                        {loading ? 'Sending' : 'Send'}
                         <Send size={16} className={loading ? 'animate-pulse' : ''} />
                       </button>
                     </div>
+                  </div>
+                  
+                  {/* Bottom disclaimer */}
+                  <div className="mt-2 text-xs text-center text-gray-500">
+                    XCodeGen AI can make mistakes. Please double-check responses.
                   </div>
                 </form>
               </div>
