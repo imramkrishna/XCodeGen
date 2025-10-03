@@ -1,11 +1,11 @@
 import React from 'react';
-import { Wand2, Github, Twitter, Linkedin, ExternalLink } from 'lucide-react';
+import { Github, Twitter, Linkedin, ExternalLink } from 'lucide-react';
 
 const Footer = () => {
   return (
     <footer className="relative w-full overflow-hidden text-gray-400 bg-black border-t border-gray-800">
       {/* Decorative background elements */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/5 to-transparent"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 via-cyan-500/5 to-transparent"></div>
       <div className="absolute w-64 h-64 rounded-full pointer-events-none bg-blue-500/10 blur-3xl -top-32 -right-32"></div>
       <div className="absolute w-64 h-64 rounded-full pointer-events-none bg-purple-500/10 blur-3xl -bottom-32 -left-32"></div>
 
@@ -38,7 +38,7 @@ const Footer = () => {
                   </g>
                 </g>
               </svg>
-              <span className="text-xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-blue-200 to-purple-300">
+              <span className="text-xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-teal-300 via-teal-200 to-cyan-300">
                 X<span className="text-white">CodeGen</span>
               </span>
             </div>
@@ -49,10 +49,10 @@ const Footer = () => {
               <a href="https://github.com/imramkrishna/XCodeGen" target='_blank' className="flex items-center justify-center text-gray-500 transition-all duration-300 rounded-lg w-9 h-9 hover:text-white hover:bg-gray-800">
                 <Github className="w-5 h-5" />
               </a>
-              <a href="https://x.com/ramkrishnacode" target='_blank' className="flex items-center justify-center text-gray-500 transition-all duration-300 rounded-lg w-9 h-9 hover:text-blue-400 hover:bg-gray-800">
+              <a href="https://x.com/ramkrishnacode" target='_blank' className="flex items-center justify-center text-gray-500 transition-all duration-300 rounded-lg w-9 h-9 hover:text-teal-400 hover:bg-gray-800">
                 <Twitter className="w-5 h-5" />
               </a>
-              <a href="https://www.linkedin.com/in/ramkrishnaprofile/" target='_blank' className="flex items-center justify-center text-gray-500 transition-all duration-300 rounded-lg w-9 h-9 hover:text-blue-600 hover:bg-gray-800">
+              <a href="https://www.linkedin.com/in/ramkrishnaprofile/" target='_blank' className="flex items-center justify-center text-gray-500 transition-all duration-300 rounded-lg w-9 h-9 hover:text-teal-600 hover:bg-gray-800">
                 <Linkedin className="w-5 h-5" />
               </a>
             </div>
@@ -89,9 +89,9 @@ const Footer = () => {
                 <input
                   type="email"
                   placeholder="Enter your email"
-                  className="flex-1 w-full px-4 py-3 text-sm text-gray-200 bg-gray-900 border border-gray-700 rounded-lg placeholder:text-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  className="flex-1 w-full px-4 py-3 text-sm text-gray-200 bg-gray-900 border border-gray-700 rounded-lg placeholder:text-gray-500 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
                 />
-                <button className="w-full px-5 py-3 text-sm font-medium text-white transition-all rounded-lg sm:w-auto bg-gradient-to-r from-blue-500 to-blue-700 hover:shadow-lg hover:shadow-blue-500/20 focus:outline-none focus:ring-2 focus:ring-blue-500/50">
+                <button className="w-full px-5 py-3 text-sm font-medium text-white transition-all rounded-lg sm:w-auto bg-gradient-to-r from-teal-500 to-teal-700 hover:shadow-lg hover:shadow-teal-500/20 focus:outline-none focus:ring-2 focus:ring-teal-500/50">
                   Subscribe
                 </button>
               </form>
@@ -145,7 +145,7 @@ const FooterColumn: React.FC<FooterColumnProps> = ({ title, items, highlight, ba
           <a
             href="#"
             className={`group flex items-center text-sm transition-colors ${item === highlight
-              ? 'text-blue-400 hover:text-blue-300'
+              ? 'text-teal-400 hover:text-teal-300'
               : 'text-gray-400 hover:text-gray-200'
               }`}
           >

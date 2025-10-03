@@ -56,7 +56,7 @@ const Header = () => {
                 </clipPath>
               </defs>
             </svg>
-            <span className="text-xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-br from-blue-300 via-blue-400 to-purple-400">
+            <span className="text-xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-br from-teal-300 via-teal-400 to-cyan-400">
               X<span className="text-white">CodeGen</span>
             </span>
           </Link>
@@ -65,10 +65,10 @@ const Header = () => {
           <nav className="items-center hidden lg:flex">
             <ul className="flex items-center">
               <NavItem to="/" label="Home" />
-              <NavItem to="#features" label="Features" hasDropdown />
-              <NavItem to="#examples" label="Examples" />
-              <NavItem to="#pricing" label="Pricing" />
-              <NavItem to="#about" label="About Us" />
+              <NavItem to="/features" label="Features" />
+              <NavItem to="/examples" label="Examples" />
+              <NavItem to="/pricing" label="Pricing" />
+              <NavItem to="/about" label="About Us" />
             </ul>
           </nav>
           
@@ -77,7 +77,7 @@ const Header = () => {
             <div className="hidden ml-6 lg:block">
               <Link
                 to="/"
-                className="px-5 py-2.5 text-sm font-medium text-white transition-all rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 shadow-md shadow-blue-500/30 hover:shadow-blue-600/40 focus:ring-2 focus:ring-blue-500/60 focus:outline-none"
+                className="px-5 py-2.5 text-sm font-medium text-white transition-all rounded-lg bg-gradient-to-br from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 shadow-md shadow-teal-500/30 hover:shadow-teal-600/40 focus:ring-2 focus:ring-teal-500/60 focus:outline-none"
               >
                 Login
               </Link>
@@ -110,17 +110,17 @@ const Header = () => {
         <div className="container px-4 py-3 mx-auto">
           <div className="pb-3 space-y-1">
             <MobileNavItem to="/" label="Home" />
-            <MobileNavItem to="#features" label="Features" />
-            <MobileNavItem to="#examples" label="Examples" />
-            <MobileNavItem to="#pricing" label="Pricing" />
-            <MobileNavItem to="#about" label="About Us" />
+            <MobileNavItem to="/features" label="Features" />
+            <MobileNavItem to="/examples" label="Examples" />
+            <MobileNavItem to="/pricing" label="Pricing" />
+            <MobileNavItem to="/about" label="About Us" />
           </div>
           
           {!isBuilderPage && (
             <div className="pt-3 border-t border-slate-800/50">
               <Link
                 to="/builder"
-                className="flex justify-center w-full px-4 py-2.5 text-sm font-medium text-white transition-all rounded-md bg-gradient-to-r from-blue-500 to-indigo-600"
+                className="flex justify-center w-full px-4 py-2.5 text-sm font-medium text-white transition-all rounded-md bg-gradient-to-r from-teal-500 to-cyan-600"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Start Building
@@ -142,15 +142,28 @@ interface NavItemProps {
 
 const NavItem: React.FC<NavItemProps> = ({ to, label, hasDropdown = false }) => {
   const location = useLocation();
-  const isActive = to === '/' ? location.pathname === '/' : location.pathname.includes(to);
+  const isActive = to === '/' ? location.pathname === '/' : 
+                   to.startsWith('#') ? false : // Hash links don't show as active
+                   location.pathname.includes(to);
+  
+  const handleClick = (e: React.MouseEvent) => {
+    if (to.startsWith('#')) {
+      e.preventDefault();
+      const element = document.getElementById(to.substring(1));
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
   
   return (
     <li className="relative mx-1 group">
       <Link
         to={to}
+        onClick={handleClick}
         className={`flex items-center px-4 py-2 text-sm font-medium transition-all rounded-md ${
           isActive 
-            ? 'text-blue-300' 
+            ? 'text-teal-300' 
             : 'text-slate-300 hover:text-white hover:bg-slate-800/50'
         }`}
       >
@@ -173,7 +186,7 @@ const NavItem: React.FC<NavItemProps> = ({ to, label, hasDropdown = false }) => 
       )}
       
       {isActive && (
-        <div className="absolute bottom-1 left-1/2 w-1/2 h-0.5 transform -translate-x-1/2 bg-gradient-to-r from-blue-400 to-indigo-400"></div>
+        <div className="absolute bottom-1 left-1/2 w-1/2 h-0.5 transform -translate-x-1/2 bg-gradient-to-r from-teal-400 to-cyan-400"></div>
       )}
     </li>
   );
@@ -190,7 +203,7 @@ const MobileNavItem: React.FC<MobileNavItemProps> = ({ to, label }) => {
   
   // Fixed active state logic for both normal and hash routes
   const isActive = to.startsWith('#') 
-    ? location.hash === to
+    ? false // Don't show hash links as active in mobile menu
     : to === '/' 
       ? location.pathname === '/' 
       : location.pathname.includes(to);
@@ -211,7 +224,7 @@ const MobileNavItem: React.FC<MobileNavItemProps> = ({ to, label }) => {
       to={to}
       className={`block px-4 py-2.5 text-base rounded-md ${
         isActive 
-          ? 'bg-slate-800/80 text-blue-300 font-medium' 
+          ? 'bg-slate-800/80 text-teal-300 font-medium' 
           : 'text-slate-300 hover:bg-slate-800/50 hover:text-white'
       }`}
       onClick={handleClick}
