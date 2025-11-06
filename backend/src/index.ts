@@ -17,7 +17,11 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 const app = express();
 app.use(express.json())
-app.use(cors())
+app.use(cors({
+    origin: ["https://x-code-gen.vercel.app"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}))
 app.listen(3000, () => {
     console.log("Server is running on port 3000")
 
