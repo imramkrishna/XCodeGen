@@ -42,7 +42,7 @@ app.post("/template", async (req, res) => {
             ]
         })
     });
-    const data:any = await response.json();
+    const data: any = await response.json();
     const answer: string = (data?.choices?.[0]?.message?.content) ?? (data?.choices?.[0]?.content) ?? "";
     console.log(data)
     if (answer?.trim() == "react") {
@@ -228,7 +228,7 @@ app.post("/chatmode", async (req, res) => {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                "model": "microsoft/mai-ds-r1:free",
+                "model": "tngtech/deepseek-r1t2-chimera:free",
                 "messages": [
                     {
                         "role": "user",
@@ -240,8 +240,14 @@ app.post("/chatmode", async (req, res) => {
         });
         const data = await response.json()
         console.log("Response from ai: ", data)
+        if (!data?.choices?.[0]?.message?.content) {
+            res.status(500).json({
+                success: false,
+                response: "No AI response returned (rate limit or provider error)"
+            });
+        }
         res.json({
-            response: data.choices[0].message.content
+            response: data.choices?.[0].message.content
         })
 
 
