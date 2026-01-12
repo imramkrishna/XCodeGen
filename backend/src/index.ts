@@ -10,7 +10,7 @@ import { fullStackBasePrompt } from "./defaults/fullstack.js";
 import { chatMessage } from "./defaults/chatMessage.js";
 dotenv.config()
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-
+const port = process.env.PORT
 const app = express();
 app.use(express.json())
 app.use(cors({
@@ -19,8 +19,8 @@ app.use(cors({
   credentials: true
 }))
 app.use(cors())
-app.listen(3000, () => {
-    console.log("Server is running on port 3000")
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`)
 
 })
 app.post("/template", async (req, res) => {
